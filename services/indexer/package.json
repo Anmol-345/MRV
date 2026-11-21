@@ -5,11 +5,14 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
+    "test": "tsx --test tests/indexer_integration.test.ts",
+    "start": "tsx src/index.ts",
+    "rebuild": "tsx src/rebuild.ts",
     "typecheck": "tsc --noEmit",
     "lint": "echo \"Indexer lint ok\""
   },
   "dependencies": {
+    "@blutoken/chain-client": "workspace:*",
     "@blutoken/database": "workspace:*",
     "@gear-js/api": "^0.45.0",
     "@polkadot/api": "^14.0.1",

@@ -13,3 +13,14 @@ export const prisma =
   });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+/**
+ * Recursively converts BigInt values to string for safe JSON serialization.
+ */
+export function serializeBigInt<T>(obj: T): any {
+  return JSON.parse(
+    JSON.stringify(obj, (_, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    )
+  );
+}

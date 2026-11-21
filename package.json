@@ -13,7 +13,8 @@
     "contracts:clippy": "cargo clippy --manifest-path contracts/Cargo.toml -- -D warnings",
     "contracts:fmt": "cargo fmt --manifest-path contracts/Cargo.toml --check",
     "contracts:deploy": "pnpm --filter @blutoken/contracts run deploy:program",
-    "contracts:smoke": "pnpm --filter @blutoken/contracts run smoke"
+    "contracts:smoke": "pnpm --filter @blutoken/contracts run smoke",
+    "indexer:rebuild": "pnpm --filter @blutoken/indexer run rebuild"
   },
   "devDependencies": {
     "tsx": "^4.19.3",

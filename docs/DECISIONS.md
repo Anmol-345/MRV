@@ -73,3 +73,21 @@ This document records the exact tool, library, and framework versions pinned acr
   - Recorded deployed program ID `0xd43593c715fdd31c6d514527da2d9d6b3e8f57b5d155fb3e5fb286dce6755a1c` in `contracts/deployed.json` and `.env.example`.
 
 
+### ADR 009: Indexer Event Projection, Idempotency & Rebuild Architecture
+- **Context:** `docs/04_OFFCHAIN_BACKEND.md` mandates an offchain indexer that projects finalized chain events into PostgreSQL read models, provides deterministic `--rebuild` capability, and ensures idempotent event processing without duplicates.
+- **Decision:**
+  - `services/indexer` records raw events in `chain_events` table with a composite unique constraint `@@unique([blockNumber, eventIndex])`.
+  - Transactional projection (`projectEvent`) processes each event within the same Prisma transaction, updating read models (`projects`, `beneficiaries`, `mrv_reports`, `votes`, `listings`, `trades`, `retirements`, `revenue_claims`, `balances`, `sync_state`).
+  - If an event is re-processed, the unique constraint violation (`P2002`) safely skips projection, ensuring zero duplicate side-effects.
+  - The `--rebuild` command (`pnpm indexer:rebuild`) truncates all projected read models in dependency order and replays all recorded `chain_events` from block 0 in chronological order, reproducing identical database state.
+  - A health server endpoint `/health` reports `blockLag` (difference between highest finalized block and last processed block).
+
+### ADR 010: Next.js REST API, Substrate Wallet Authentication & IoT Telemetry Security
+- **Context:** Next.js App Router API routes must serve public statistics, project metadata, MRV reports, marketplace listings, retirements, audit logs, and citizen reports, alongside authenticated routes for wallet sign-in, file uploads, and IoT sensor ingestion.
+- **Decision:**
+  - **Serialization:** Added `serializeBigInt` helper in `@blutoken/database` and `apps/web/src/lib/api-helpers.ts` converting all `BigInt` values to strings in JSON responses, preventing JavaScript BigInt serialization crashes.
+  - **Disclaimer:** Every API response includes the mandatory header `X-BluToken-Notice: BluTokens are pilot registry tokens, not government-certified credits.`
+  - **Wallet Auth:** Implemented cryptographic challenge-response using `@polkadot/util-crypto`'s `signatureVerify`. Client requests nonce (`POST /api/auth/nonce`), signs with Substrate wallet (sr25519/ed25519), and verifies on `POST /api/auth/verify`. Returns session JWT via `httpOnly` secure cookie.
+  - **Citizen Report Privacy:** Coordinates on public `GET /api/citizen-reports` are jittered/rounded to 2 decimal places (~1.1 km) to protect sensitive coastal sites, while elevated users (Admin/Verifier) access exact coordinates.
+  - **IoT Sensor Telemetry:** Sensor devices are registered with ed25519 public keys (`POST /api/devices`). Ingestion endpoint (`POST /api/ingest/sensor`) enforces a 15-minute clock drift freshness window, memory-cached nonce replay prevention, and ed25519 detached signature verification before writing to `sensor_readings`.
+  - **MRV Worker Integration:** Satellite observation callbacks (`POST /api/internal/mrv/callback`) require matching shared secret header `X-MRV-Secret`.

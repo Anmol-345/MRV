@@ -6,6 +6,8 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
     "typecheck": "tsc --noEmit",
     "lint": "echo \"Database lint ok\""
   },
