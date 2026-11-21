@@ -56,3 +56,12 @@ This document records the exact tool, library, and framework versions pinned acr
 ### ADR 005: Pilot Registry Disclaimer
 - **Context:** BluTokens represent pilot registry carbon offsets and are not legal regulatory credits under government certification schemes (e.g. CCTS, Verra).
 - **Decision:** A mandatory, visible disclaimer badge is displayed across public UI views, marketplace listings, and generated retirement certificates: *"BluTokens are pilot registry tokens, not government-certified credits."*
+
+### ADR 006: Thread-Local State Isolation for Native Cargo Tests
+- **Context:** In Sails smart contracts running in integration tests outside WASM, multiple tests execute concurrently in parallel threads across the test harness. Shared static mutex state causes cross-test data race conditions and unexpected state mutations.
+- **Decision:** On `cfg(not(target_arch = "wasm32"))`, contract state `STORAGE` is managed via `std::thread_local!` with `core::cell::RefCell<Option<Storage>>`. On `cfg(target_arch = "wasm32")`, `STORAGE` uses `sails_rs::spin::Mutex`. This guarantees 100% test isolation with zero concurrency interference during native test runs.
+
+### ADR 007: Phase 2 IDL Freeze & sails-js-cli Service Property Collision Resolution
+- **Context:** Per `docs/03_SMART_CONTRACTS_VARA.md` and `docs/07_TASKS_AND_PROMPTS.md`, Phase 2 requires implementing `Admin`, `Bluvft`, `Market`, and `Registry` services and freezing the generated IDL (`contracts/client/blutoken.idl`). When `sails-js-cli` generates TypeScript wrappers, it hardcodes `public readonly registry: TypeRegistry;` for Polkadot types while simultaneously defining `public readonly registry: Registry;` for the Sails `Registry` service, resulting in a duplicate identifier compiler error.
+- **Decision:** The program IDL `contracts/client/blutoken.idl` is officially frozen for Phase 2. A deterministic post-processing step in `packages/chain-client/scripts/generate.js` renames the internal Polkadot TypeRegistry field to `this.typeRegistry`, preserving the canonical `program.registry` service API for callers while ensuring strict TypeScript compilation with zero errors.
+

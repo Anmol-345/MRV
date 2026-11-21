@@ -1,5 +1,5 @@
 #![no_std]
-#![allow(clippy::missing_const_for_thread_local)]
+#![allow(clippy::missing_const_for_thread_local, clippy::too_many_arguments)]
 
 #[cfg(not(target_arch = "wasm32"))]
 extern crate std;
@@ -9,7 +9,7 @@ pub mod state;
 pub mod types;
 
 use sails_rs::{prelude::*, ActorId};
-use services::{AdminService, BluvftService};
+use services::{AdminService, BluvftService, MarketService, RegistryService};
 use state::{reset_storage, with_storage_mut};
 use types::Role;
 
@@ -43,5 +43,13 @@ impl BluTokenProgram {
 
     pub fn bluvft(&self) -> BluvftService {
         BluvftService::new()
+    }
+
+    pub fn registry(&self) -> RegistryService {
+        RegistryService::new()
+    }
+
+    pub fn market(&self) -> MarketService {
+        MarketService::new()
     }
 }

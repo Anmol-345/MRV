@@ -1,39 +1,13 @@
 /**
  * BluToken Chain Client
  * 
- * Provides type definitions, constants, and utilities for interacting
- * with the on-chain BluToken Sails program on Vara Network.
+ * Provides generated Sails program client, type definitions, constants,
+ * and utilities for interacting with the on-chain BluToken Sails program on Vara Network.
  */
 
 export const BLU_DECIMALS = 3;
 export const MILLI_PER_BLU = 1000n;
 export const PLANCK_PER_VARA = 1_000_000_000_000n;
-
-export enum Ecosystem {
-  Mangrove = 'Mangrove',
-  Seagrass = 'Seagrass',
-  SaltMarsh = 'SaltMarsh',
-}
-
-export enum Role {
-  Admin = 'Admin',
-  Verifier = 'Verifier',
-  ProjectOwner = 'ProjectOwner',
-}
-
-export enum ProjectStatus {
-  Pending = 'Pending',
-  Active = 'Active',
-  Suspended = 'Suspended',
-  Closed = 'Closed',
-}
-
-export enum ReportStatus {
-  Submitted = 'Submitted',
-  Verified = 'Verified',
-  Rejected = 'Rejected',
-  Cancelled = 'Cancelled',
-}
 
 /**
  * Format milli-BLU (u128) to human-readable BLU (tCO2e)
@@ -63,3 +37,6 @@ export function parseBlu(bluAmount: string): bigint {
   const fraction = BigInt(paddedFraction || '0');
   return whole + fraction;
 }
+
+// Re-export generated Sails program and types
+export * from './generated/lib.js';

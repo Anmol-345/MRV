@@ -66,6 +66,64 @@ impl Default for Params {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Encode, Decode, TypeInfo)]
+pub struct Project {
+    pub id: ProjectId,
+    pub owner: ActorId,
+    pub name: String,
+    pub ecosystem: Ecosystem,
+    pub state_code: String,
+    pub boundary_cid: String,
+    pub area_ha_x100: u64,
+    pub beneficiaries: Vec<Beneficiary>,
+    pub status: ProjectStatus,
+    pub total_minted: u128,
+    pub total_retired: u128,
+    pub buffer_held: u128,
+    pub created_at: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Encode, Decode, TypeInfo)]
+pub struct MrvReport {
+    pub id: ReportId,
+    pub project_id: ProjectId,
+    pub submitter: ActorId,
+    pub period_start: u64,
+    pub period_end: u64,
+    pub data_hash: [u8; 32],
+    pub data_cid: String,
+    pub estimated_milli_tco2e: u128,
+    pub methodology_version: String,
+    pub status: ReportStatus,
+    pub approvals: Vec<ActorId>,
+    pub rejections: Vec<ActorId>,
+    pub minted: u128,
+    pub buffered: u128,
+    pub created_at: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Encode, Decode, TypeInfo)]
+pub struct Listing {
+    pub id: ListingId,
+    pub project_id: ProjectId,
+    pub seller: ActorId,
+    pub remaining: u128,
+    pub price_per_milli: u128,
+    pub active: bool,
+    pub created_at: u64,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Encode, Decode, TypeInfo)]
+pub struct Retirement {
+    pub id: RetirementId,
+    pub project_id: ProjectId,
+    pub retiree: ActorId,
+    pub amount: u128,
+    pub beneficiary_name: String,
+    pub reason: String,
+    pub at: u64,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Encode, Decode, TypeInfo)]
 pub enum Error {
     Unauthorized,

@@ -32,6 +32,85 @@ type Params = struct {
   paused: bool,
 };
 
+type Listing = struct {
+  id: u64,
+  project_id: u64,
+  seller: actor_id,
+  remaining: u128,
+  price_per_milli: u128,
+  active: bool,
+  created_at: u64,
+};
+
+type Retirement = struct {
+  id: u64,
+  project_id: u64,
+  retiree: actor_id,
+  amount: u128,
+  beneficiary_name: str,
+  reason: str,
+  at: u64,
+};
+
+type Ecosystem = enum {
+  Mangrove,
+  Seagrass,
+  SaltMarsh,
+};
+
+type Beneficiary = struct {
+  who: actor_id,
+  share_bps: u16,
+};
+
+type MrvReport = struct {
+  id: u64,
+  project_id: u64,
+  submitter: actor_id,
+  period_start: u64,
+  period_end: u64,
+  data_hash: [u8, 32],
+  data_cid: str,
+  estimated_milli_tco2e: u128,
+  methodology_version: str,
+  status: ReportStatus,
+  approvals: vec actor_id,
+  rejections: vec actor_id,
+  minted: u128,
+  buffered: u128,
+  created_at: u64,
+};
+
+type ReportStatus = enum {
+  Submitted,
+  Verified,
+  Rejected,
+  Cancelled,
+};
+
+type Project = struct {
+  id: u64,
+  owner: actor_id,
+  name: str,
+  ecosystem: Ecosystem,
+  state_code: str,
+  boundary_cid: str,
+  area_ha_x100: u64,
+  beneficiaries: vec Beneficiary,
+  status: ProjectStatus,
+  total_minted: u128,
+  total_retired: u128,
+  buffer_held: u128,
+  created_at: u64,
+};
+
+type ProjectStatus = enum {
+  Pending,
+  Active,
+  Suspended,
+  Closed,
+};
+
 constructor {
   New : ();
   WithAdmin : (admin: actor_id);
@@ -75,6 +154,61 @@ service Bluvft {
     Approval: struct { owner: actor_id, spender: actor_id, amount: u128 };
     Minted: struct { to: actor_id, amount: u128 };
     Burned: struct { from: actor_id, amount: u128 };
+  }
+};
+
+service Market {
+  Buy : (listing_id: u64, amount: u128) -> result (null, Error);
+  BuyAndRetire : (listing_id: u64, amount: u128, beneficiary_name: str, reason: str) -> result (u64, Error);
+  CancelListing : (id: u64) -> result (null, Error);
+  ClaimRevenue : (project_id: u64) -> result (u128, Error);
+  CreateListing : (project_id: u64, amount: u128, price_per_milli: u128) -> result (u64, Error);
+  Retire : (project_id: u64, amount: u128, beneficiary_name: str, reason: str) -> result (u64, Error);
+  query Claimable : (project_id: u64, who: actor_id) -> u128;
+  query Listing : (id: u64) -> opt Listing;
+  query Listings : (offset: u32, limit: u32, filter: opt bool) -> vec Listing;
+  query NativeVaraHeld : () -> u128;
+  query PendingRevenueDust : () -> u128;
+  query Retirement : (id: u64) -> opt Retirement;
+  query RetirementsBy : (who: actor_id, offset: u32, limit: u32) -> vec Retirement;
+  query TreasuryAccrual : () -> u128;
+
+  events {
+    ListingCreated: struct { id: u64, project_id: u64, seller: actor_id, amount: u128, price_per_milli: u128 };
+    ListingCancelled: struct { id: u64 };
+    ListingFilled: struct { id: u64, buyer: actor_id, amount: u128, total_paid: u128 };
+    RevenueAccrued: struct { project_id: u64, value: u128 };
+    Retired: struct { id: u64, project_id: u64, retiree: actor_id, amount: u128, beneficiary_name: str, reason: str };
+    RevenueClaimed: struct { project_id: u64, who: actor_id, amount: u128 };
+  }
+};
+
+service Registry {
+  ActivateProject : (id: u64) -> result (null, Error);
+  CancelReport : (report_id: u64) -> result (null, Error);
+  CloseProject : (id: u64) -> result (null, Error);
+  FlagReversal : (project_id: u64, amount: u128, evidence_cid: str) -> result (u128, Error);
+  RegisterProject : (name: str, ecosystem: Ecosystem, state_code: str, boundary_cid: str, area_ha_x100: u64, beneficiaries: vec Beneficiary) -> result (u64, Error);
+  SetBeneficiaries : (id: u64, beneficiaries: vec Beneficiary) -> result (null, Error);
+  SubmitReport : (project_id: u64, period_start: u64, period_end: u64, data_hash: [u8, 32], data_cid: str, estimated_milli_tco2e: u128, methodology_version: str) -> result (u64, Error);
+  SuspendProject : (id: u64) -> result (null, Error);
+  VoteReport : (report_id: u64, approve: bool, note_hash: opt [u8, 32]) -> result (null, Error);
+  query PendingReports : (offset: u32, limit: u32) -> vec MrvReport;
+  query Project : (id: u64) -> opt Project;
+  query Projects : (offset: u32, limit: u32, filter: opt ProjectStatus) -> vec Project;
+  query Report : (id: u64) -> opt MrvReport;
+  query ReportsByProject : (project_id: u64, offset: u32, limit: u32) -> vec MrvReport;
+
+  events {
+    ProjectRegistered: struct { id: u64, owner: actor_id, name: str, ecosystem: Ecosystem, state_code: str, boundary_cid: str, area_ha_x100: u64, beneficiaries: vec Beneficiary };
+    ProjectStatusChanged: struct { id: u64, status: ProjectStatus };
+    BeneficiariesSet: struct { id: u64, beneficiaries: vec Beneficiary };
+    ReportSubmitted: struct { id: u64, project_id: u64, submitter: actor_id, period_start: u64, period_end: u64, data_hash: [u8, 32], data_cid: str, estimated_milli_tco2e: u128, methodology_version: str };
+    ReportVoted: struct { report_id: u64, voter: actor_id, approve: bool, note_hash: opt [u8, 32] };
+    ReportVerified: struct { report_id: u64, project_id: u64, minted: u128, buffered: u128 };
+    ReportRejected: struct { report_id: u64, project_id: u64 };
+    ReportCancelled: struct { report_id: u64 };
+    ReversalFlagged: struct { project_id: u64, amount: u128, deficit: u128, evidence_cid: str };
   }
 };
 
