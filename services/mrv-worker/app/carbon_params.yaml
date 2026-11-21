@@ -1,0 +1,22 @@
+# Production Carbon Parameters Template
+# WARNING: A marine/coastal-carbon expert (e.g. NCCR) must review and populate all coefficients before production use.
+# Per docs/05_MRV_AI_PIPELINE.md, the worker MUST refuse to run if any TODO values remain.
+
+methodology_version: "bc-india-0.1"
+ecosystems:
+  mangrove:
+    agb_tc_ha: TODO
+    bgb_tc_ha: TODO
+    soc_tc_ha: TODO
+    uncertainty_pct: TODO
+  seagrass:
+    agb_tc_ha: TODO
+    bgb_tc_ha: TODO
+    soc_tc_ha: TODO
+    uncertainty_pct: TODO
+  salt_marsh:
+    agb_tc_ha: TODO
+    bgb_tc_ha: TODO
+    soc_tc_ha: TODO
+    uncertainty_pct: TODO
+leakage_pct: TODO

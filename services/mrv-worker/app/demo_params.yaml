@@ -1,19 +1,22 @@
+# Calibrated Demo Carbon Parameters (Tagged DEMO)
+# For reproducible demonstration and testnet verification per docs/05_MRV_AI_PIPELINE.md
+
 methodology_version: "bc-india-0.1-DEMO"
 tag: "DEMO"
 ecosystems:
   mangrove:
-    agb_tc_ha: 120.0
-    bgb_tc_ha: 40.0
-    soc_tc_ha: 280.0
-    uncertainty_pct: 10.0
+    agb_tc_ha: 120.0       # Above-ground biomass: ~120 tC/ha
+    bgb_tc_ha: 40.0        # Below-ground biomass (roots): ~40 tC/ha
+    soc_tc_ha: 280.0       # Soil organic carbon (top 1m): ~280 tC/ha
+    uncertainty_pct: 10.0  # Conservative 10% uncertainty discount
   seagrass:
-    agb_tc_ha: 2.5
-    bgb_tc_ha: 15.0
-    soc_tc_ha: 140.0
-    uncertainty_pct: 15.0
+    agb_tc_ha: 2.5         # Above-ground biomass: ~2.5 tC/ha
+    bgb_tc_ha: 15.0        # Rhizome/roots: ~15 tC/ha
+    soc_tc_ha: 140.0       # Sediment carbon: ~140 tC/ha
+    uncertainty_pct: 15.0  # 15% uncertainty discount
   salt_marsh:
-    agb_tc_ha: 5.0
-    bgb_tc_ha: 25.0
-    soc_tc_ha: 160.0
-    uncertainty_pct: 12.0
-leakage_pct: 5.0
+    agb_tc_ha: 5.0         # Herbaceous biomass: ~5 tC/ha
+    bgb_tc_ha: 25.0        # Root mat: ~25 tC/ha
+    soc_tc_ha: 160.0       # Sediment carbon: ~160 tC/ha
+    uncertainty_pct: 12.0  # 12% uncertainty discount
+leakage_pct: 5.0           # 5% conservative leakage deduction

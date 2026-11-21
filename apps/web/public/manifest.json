@@ -1,0 +1,16 @@
+{
+  "name": "BluToken Citizen MRV",
+  "short_name": "BluToken PWA",
+  "description": "Offline-first citizen environmental reporting for India's blue carbon coastal ecosystems",
+  "start_url": "/report-threat",
+  "display": "standalone",
+  "background_color": "#F3F5EE",
+  "theme_color": "#203D2E",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
