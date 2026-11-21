@@ -1,0 +1,15 @@
+[package]
+name = "blutoken-app"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+sails-rs = { workspace = true, features = ["gstd"] }
+parity-scale-codec = { workspace = true }
+scale-info = { workspace = true }
+
+[build-dependencies]
+sails-rs = { version = "0.6.3", features = ["wasm-builder"] }
+sails-idl-gen = { version = "0.6.3" }

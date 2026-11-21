@@ -1,0 +1,11 @@
+[package]
+name = "blutoken-tests"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dev-dependencies]
+sails-rs = { version = "0.6.3", features = ["gtest"] }
+blutoken-app = { path = "../app" }
+blutoken-client = { path = "../client" }

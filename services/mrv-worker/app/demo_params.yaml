@@ -1,0 +1,19 @@
+methodology_version: "bc-india-0.1-DEMO"
+tag: "DEMO"
+ecosystems:
+  mangrove:
+    agb_tc_ha: 120.0
+    bgb_tc_ha: 40.0
+    soc_tc_ha: 280.0
+    uncertainty_pct: 10.0
+  seagrass:
+    agb_tc_ha: 2.5
+    bgb_tc_ha: 15.0
+    soc_tc_ha: 140.0
+    uncertainty_pct: 15.0
+  salt_marsh:
+    agb_tc_ha: 5.0
+    bgb_tc_ha: 25.0
+    soc_tc_ha: 160.0
+    uncertainty_pct: 12.0
+leakage_pct: 5.0

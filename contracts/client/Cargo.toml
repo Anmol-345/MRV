@@ -1,0 +1,12 @@
+[package]
+name = "blutoken-client"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+sails-rs = { workspace = true }
+parity-scale-codec = { workspace = true }
+scale-info = { workspace = true }
+blutoken-app = { workspace = true }

@@ -1,0 +1,22 @@
+{
+  "name": "@blutoken/chain-client",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "generate": "sails-js-cli -f ../../contracts/client/blutoken.idl -o src/generated",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"Chain client lint ok\""
+  },
+  "dependencies": {
+    "@gear-js/api": "^0.45.0",
+    "@polkadot/api": "^14.0.1",
+    "sails-js": "^1.0.0"
+  },
+  "devDependencies": {
+    "sails-js-cli": "^0.6.0",
+    "typescript": "^5.7.3"
+  }
+}

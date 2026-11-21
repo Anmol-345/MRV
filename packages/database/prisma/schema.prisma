@@ -1,0 +1,276 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum OrgKind {
+  NCCR
+  MOEFCC
+  NGO
+  COOP
+  INDUSTRY
+}
+
+enum Ecosystem {
+  Mangrove
+  Seagrass
+  SaltMarsh
+}
+
+enum ProjectStatus {
+  Pending
+  Active
+  Suspended
+  Closed
+}
+
+enum ReportStatus {
+  Submitted
+  Verified
+  Rejected
+  Cancelled
+}
+
+enum CitizenReportKind {
+  MANGROVE_LOSS
+  POLLUTION
+  RECLAMATION
+  DEAD_ZONE
+  OTHER
+}
+
+enum CitizenReportStatus {
+  NEW
+  TRIAGED
+  CONFIRMED
+  DISMISSED
+}
+
+model Organization {
+  id        Int       @id @default(autoincrement())
+  name      String
+  kind      OrgKind
+  website   String?
+  projects  Project[]
+  users     User[]
+}
+
+model User {
+  wallet       String        @id
+  displayName  String?
+  orgId        Int?
+  organization Organization? @relation(fields: [orgId], references: [id])
+  locale       String        @default("en")
+  createdAt    DateTime      @default(now())
+}
+
+model Project {
+  id              BigInt         @id
+  ownerWallet     String
+  orgId           Int?
+  organization    Organization?  @relation(fields: [orgId], references: [id])
+  name            String
+  ecosystem       Ecosystem
+  stateCode       String
+  boundaryCid     String
+  boundaryGeojson Json?
+  areaHa          Decimal
+  status          ProjectStatus  @default(Pending)
+  totalMinted     BigInt         @default(0)
+  totalRetired    BigInt         @default(0)
+  bufferHeld      BigInt         @default(0)
+  pendingRevenue  BigInt         @default(0)
+  createdAt       DateTime       @default(now())
+  description     String?
+  coverImageCid   String?
+
+  beneficiaries   Beneficiary[]
+  reports         MrvReport[]
+  listings        Listing[]
+  retirements     Retirement[]
+  revenueClaims   RevenueClaim[]
+  observations    SatelliteObservation[]
+  devices         SensorDevice[]
+  citizenReports  CitizenReport[]
+
+  @@index([status, stateCode])
+}
+
+model Beneficiary {
+  id          Int      @id @default(autoincrement())
+  projectId   BigInt
+  project     Project  @relation(fields: [projectId], references: [id])
+  wallet      String
+  shareBps    Int
+  displayName String?
+
+  @@unique([projectId, wallet])
+}
+
+model MrvReport {
+  id                 BigInt        @id
+  projectId          BigInt
+  project            Project       @relation(fields: [projectId], references: [id])
+  submitter          String
+  periodStart        BigInt
+  periodEnd          BigInt
+  dataHash           String
+  dataCid            String
+  estimatedMilli     BigInt
+  methodologyVersion String
+  status             ReportStatus  @default(Submitted)
+  minted             BigInt        @default(0)
+  buffered           BigInt        @default(0)
+  createdAt          DateTime      @default(now())
+
+  votes              Vote[]
+
+  @@index([projectId, status])
+}
+
+model Vote {
+  id             Int       @id @default(autoincrement())
+  reportId       BigInt
+  report         MrvReport @relation(fields: [reportId], references: [id])
+  verifierWallet String
+  approve        Boolean
+  noteHash       String?
+  noteText       String?
+  ts             DateTime  @default(now())
+
+  @@unique([reportId, verifierWallet])
+}
+
+model SatelliteObservation {
+  id        Int      @id @default(autoincrement())
+  projectId BigInt
+  project   Project  @relation(fields: [projectId], references: [id])
+  date      DateTime
+  source    String
+  ndviMean  Float
+  canopyHa  Float
+  waterHa   Float
+  cloudPct  Float
+  rasterCid String?
+
+  @@index([projectId, date])
+}
+
+model SensorDevice {
+  id        String          @id
+  projectId BigInt
+  project   Project         @relation(fields: [projectId], references: [id])
+  publicKey String
+  kind      String
+  lat       Float
+  lng       Float
+  status    String          @default("ACTIVE")
+  lastSeen  DateTime?
+
+  readings  SensorReading[]
+}
+
+model SensorReading {
+  id          BigInt       @id @default(autoincrement())
+  deviceId    String
+  device      SensorDevice @relation(fields: [deviceId], references: [id])
+  ts          DateTime
+  value       Float
+  unit        String
+  signatureOk Boolean      @default(true)
+
+  @@index([deviceId, ts])
+}
+
+model CitizenReport {
+  id            String              @id @default(uuid())
+  reporterWallet String?
+  projectId     BigInt?
+  project       Project?            @relation(fields: [projectId], references: [id])
+  kind          CitizenReportKind
+  lat           Float
+  lng           Float
+  description   String
+  photoCids     String[]
+  status        CitizenReportStatus @default(NEW)
+  anchoredHash  String?
+  createdAt     DateTime            @default(now())
+
+  @@index([status])
+}
+
+model Listing {
+  id             BigInt   @id
+  projectId      BigInt
+  project        Project  @relation(fields: [projectId], references: [id])
+  seller         String
+  remaining      BigInt
+  pricePerMilli  BigInt
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  trades         Trade[]
+}
+
+model Trade {
+  id        Int      @id @default(autoincrement())
+  listingId BigInt
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  buyer     String
+  amount    BigInt
+  value     BigInt
+  retired   Boolean  @default(false)
+  txHash    String
+  ts        DateTime @default(now())
+}
+
+model Retirement {
+  id              BigInt   @id
+  projectId       BigInt
+  project         Project  @relation(fields: [projectId], references: [id])
+  retiree         String
+  amount          BigInt
+  beneficiaryName String
+  reason          String
+  ts              DateTime @default(now())
+  certificateCid  String?
+
+  @@index([retiree])
+}
+
+model RevenueClaim {
+  id        Int      @id @default(autoincrement())
+  projectId BigInt
+  project   Project  @relation(fields: [projectId], references: [id])
+  wallet    String
+  amount    BigInt
+  ts        DateTime @default(now())
+}
+
+model Balance {
+  wallet       String @id
+  balanceMilli BigInt @default(0)
+}
+
+model ChainEvent {
+  id          BigInt   @id @default(autoincrement())
+  blockNumber BigInt
+  eventIndex  Int
+  service     String
+  name        String
+  payload     Json
+  txHash      String
+  ts          DateTime
+
+  @@unique([blockNumber, eventIndex])
+  @@index([service, name])
+}
+
+model SyncState {
+  key   String @id
+  value String
+}
