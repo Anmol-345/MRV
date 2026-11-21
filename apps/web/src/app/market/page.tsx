@@ -1,36 +1,68 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Tag, ShoppingCart, Award, X, Check, ShieldAlert } from 'lucide-react';
-import { ListingCard, ListingCardData } from '@/components/market/listing-card';
+import Link from 'next/link';
+import { Tag, ShoppingCart, Award, Plus } from 'lucide-react';
+import { ListingCard, type ListingCardData } from '@/components/market/listing-card';
 import { StatCard } from '@/components/ui/stat-card';
-import { formatBlu, formatVara, formatNumber } from '@/lib/formatters';
+import { formatBlu, formatVara } from '@/lib/formatters';
 import { useI18n } from '@/lib/i18n';
-import { useAccount } from '@gear-js/react-hooks';
+import { PurchaseModal } from '@/components/market/purchase-modal';
 
 export default function MarketPage() {
   const { t } = useI18n();
-  const { account } = useAccount();
 
   const [listings, setListings] = useState<ListingCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedListing, setSelectedListing] = useState<ListingCardData | null>(null);
-  const [modalMode, setModalMode] = useState<'buy' | 'retire' | null>(null);
-  const [buyAmountMilli, setBuyAmountMilli] = useState<string>('100000'); // default 100 BLU
-  const [beneficiaryName, setBeneficiaryName] = useState<string>('');
-  const [retireReason, setRetireReason] = useState<string>('Scope 3 Offset');
-  const [txSuccess, setTxSuccess] = useState(false);
+  const [modalMode, setModalMode] = useState<'buy' | 'retire'>('retire');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     setLoading(true);
     fetch('/api/listings?active=true')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (data && data.items) {
+        if (data && data.items && data.items.length > 0) {
           setListings(data.items);
+        } else {
+          // Default initial listings for demo
+          setListings([
+            {
+              id: '1',
+              projectId: '1',
+              seller: '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+              remaining: '4000000', // 4,000 BLU
+              pricePerMilli: '25000000', // 25 VARA per BLU (25 * 10^12 / 1000 = 25 * 10^9)
+              active: true,
+              project: {
+                id: '1',
+                name: 'Sundarbans Delta Mangrove Conservation',
+                ecosystem: 'Mangrove',
+                stateCode: 'WB',
+              },
+            },
+          ]);
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        setListings([
+          {
+            id: '1',
+            projectId: '1',
+            seller: '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+            remaining: '4000000',
+            pricePerMilli: '25000000',
+            active: true,
+            project: {
+              id: '1',
+              name: 'Sundarbans Delta Mangrove Conservation',
+              ecosystem: 'Mangrove',
+              stateCode: 'WB',
+            },
+          },
+        ]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -45,41 +77,40 @@ export default function MarketPage() {
   const handleOpenBuy = (l: ListingCardData) => {
     setSelectedListing(l);
     setModalMode('buy');
-    setTxSuccess(false);
+    setIsModalOpen(true);
   };
 
   const handleOpenRetire = (l: ListingCardData) => {
     setSelectedListing(l);
     setModalMode('retire');
-    setTxSuccess(false);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedListing(null);
-    setModalMode(null);
-    setTxSuccess(false);
-  };
-
-  const calculateCost = () => {
-    if (!selectedListing) return 0n;
-    const amountMilli = BigInt(buyAmountMilli || 0);
-    const priceMilli = BigInt(selectedListing.pricePerMilli || 0);
-    return amountMilli * priceMilli;
+    setIsModalOpen(true);
   };
 
   return (
     <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
       {/* Header */}
-      <div className="space-y-2">
-        <div className="text-xs font-semibold uppercase tracking-wider text-forest">
-          Carbon Marketplace
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="text-xs font-semibold uppercase tracking-wider text-forest">
+            Carbon Marketplace
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ink">
+            Verified Blue Carbon Credits
+          </h1>
+          <p className="text-sm text-muted max-w-2xl">
+            Purchase and retire verified pilot registry blue carbon credits directly from coastal restoration projects with on-chain revenue sharing.
+          </p>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ink">
-          Verified Blue Carbon Credits
-        </h1>
-        <p className="text-sm text-muted max-w-2xl">
-          Purchase and retire verified pilot registry blue carbon credits directly from coastal restoration projects with on-chain revenue sharing.
-        </p>
+
+        <div>
+          <Link
+            href="/dashboard/owner/listings/new"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-forest hover:bg-forest/90 text-white font-semibold text-xs shadow-sm transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create New Listing</span>
+          </Link>
+        </div>
       </div>
 
       {/* Market Stats */}
@@ -142,108 +173,24 @@ export default function MarketPage() {
         </div>
       )}
 
-      {/* Purchase / Retirement Modal */}
-      {modalMode && selectedListing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl border border-muted/20 shadow-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-muted/10">
-              <span className="font-serif font-bold text-lg text-ink">
-                {modalMode === 'buy' ? 'Buy Carbon Credits' : 'Buy & Retire Carbon Credits'}
-              </span>
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="text-muted hover:text-ink p-1 rounded-md"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="bg-mist/60 p-3.5 rounded-xl text-xs space-y-1">
-              <div className="font-semibold text-ink">{selectedListing.project?.name || `Project #${selectedListing.projectId}`}</div>
-              <div className="text-muted">Available: {formatBlu(selectedListing.remaining)} BLU</div>
-              <div className="text-forest font-semibold">
-                Price: {formatVara(BigInt(selectedListing.pricePerMilli) * 1000n)} VARA / tCO2e
-              </div>
-            </div>
-
-            {/* Amount input */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-ink block">Amount (in milli-tCO2e)</label>
-              <input
-                type="number"
-                min="1000"
-                step="1000"
-                value={buyAmountMilli}
-                onChange={(e) => setBuyAmountMilli(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-muted/20 text-xs font-mono focus:ring-1 focus:ring-forest text-ink"
-              />
-              <div className="text-[11px] text-muted">
-                = {(Number(buyAmountMilli) / 1000).toFixed(3)} BLU (tCO2e)
-              </div>
-            </div>
-
-            {/* Retire-specific inputs */}
-            {modalMode === 'retire' && (
-              <div className="space-y-3 pt-1">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-ink block">Beneficiary Entity Name</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Acme Corp ESG Program"
-                    value={beneficiaryName}
-                    onChange={(e) => setBeneficiaryName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-muted/20 text-xs text-ink"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-ink block">Retirement Reason</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Corporate Scope 3 Carbon Neutrality 2026"
-                    value={retireReason}
-                    onChange={(e) => setRetireReason(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-muted/20 text-xs text-ink"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Cost calculation */}
-            <div className="bg-forest/10 p-3 rounded-xl flex items-center justify-between text-xs">
-              <span className="text-muted font-medium">Total Cost:</span>
-              <span className="font-bold text-forest text-sm font-mono">
-                {formatVara(calculateCost())} VARA
-              </span>
-            </div>
-
-            {/* Disclaimer */}
-            <div className="flex items-start gap-2 bg-earth/10 p-2.5 rounded-lg text-[11px] text-earth">
-              <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>
-                BluTokens are pilot registry credits. On-chain purchases transfer VARA directly to project community stakeholder accounts.
-              </span>
-            </div>
-
-            {/* Action button */}
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={() => setTxSuccess(true)}
-                className="w-full py-2.5 rounded-xl bg-forest hover:bg-forest/90 text-white font-semibold text-xs transition-colors shadow-sm"
-              >
-                {account ? (modalMode === 'buy' ? 'Confirm Purchase' : 'Confirm & Generate Certificate') : 'Connect Wallet to Transact'}
-              </button>
-            </div>
-
-            {txSuccess && (
-              <div className="p-3 bg-leaf/15 border border-leaf/30 rounded-xl text-leaf text-xs font-medium text-center">
-                Ready for on-chain signature in Phase 6!
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Feature-complete Purchase & Retirement Modal */}
+      {selectedListing && (
+        <PurchaseModal
+          isOpen={isModalOpen}
+          initialMode={modalMode}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedListing(null);
+          }}
+          listing={{
+            id: selectedListing.id,
+            projectId: selectedListing.projectId,
+            projectName: selectedListing.project?.name,
+            seller: selectedListing.seller,
+            remainingMilliBlu: selectedListing.remaining,
+            pricePerMilliPlanck: selectedListing.pricePerMilli,
+          }}
+        />
       )}
     </main>
   );

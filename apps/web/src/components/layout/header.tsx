@@ -17,6 +17,10 @@ export function Header() {
     { href: '/projects', label: t.nav.projects },
     { href: '/market', label: t.nav.market },
     { href: '/audit', label: t.nav.audit },
+    { href: '/dashboard/owner', label: 'Developer' },
+    { href: '/dashboard/verifier', label: 'Verifier' },
+    { href: '/dashboard/community', label: 'Community' },
+    { href: '/admin', label: 'Admin' },
   ];
 
   const toggleLanguage = () => {
