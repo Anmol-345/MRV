@@ -6,6 +6,6 @@ authors.workspace = true
 license.workspace = true
 
 [dev-dependencies]
-sails-rs = { version = "0.6.3", features = ["gtest"] }
+sails-rs = { version = "0.6.3", features = ["gtest", "idl-gen"] }
 blutoken-app = { path = "../app" }
 blutoken-client = { path = "../client" }

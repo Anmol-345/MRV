@@ -1,3 +1,80 @@
+type Role = enum {
+  Admin,
+  Verifier,
+  ProjectOwner,
+};
+
+type Error = enum {
+  Unauthorized,
+  Paused,
+  NotFound,
+  InvalidInput,
+  InvalidShares,
+  ProjectNotActive,
+  OverlappingPeriod,
+  AlreadyVoted,
+  ConflictOfInterest,
+  QuorumImpossible,
+  InsufficientBalance,
+  InsufficientListing,
+  WrongPayment,
+  NothingToClaim,
+  BufferDeficit,
+  Overflow,
+};
+
+type Params = struct {
+  quorum: u8,
+  min_orgs: u8,
+  buffer_bps: u16,
+  platform_fee_bps: u16,
+  treasury: actor_id,
+  paused: bool,
+};
+
 constructor {
   New : ();
+  WithAdmin : (admin: actor_id);
 };
+
+service Admin {
+  GrantRole : (who: actor_id, role: Role, org_id: opt u32) -> result (null, Error);
+  Pause : () -> result (null, Error);
+  RevokeRole : (who: actor_id, role: Role) -> result (null, Error);
+  SetParams : (params: Params) -> result (null, Error);
+  Unpause : () -> result (null, Error);
+  query IsPaused : () -> bool;
+  query IsRole : (who: actor_id, role: Role) -> bool;
+  query Params : () -> Params;
+  query RolesOf : (who: actor_id) -> vec Role;
+  query VerifierOrg : (who: actor_id) -> opt u32;
+  query Verifiers : (offset: u32, limit: u32) -> vec struct { actor_id, u32 };
+
+  events {
+    RoleGranted: struct { who: actor_id, role: Role, org_id: opt u32 };
+    RoleRevoked: struct { who: actor_id, role: Role };
+    ParamsUpdated: struct { params: Params };
+    Paused;
+    Unpaused;
+  }
+};
+
+service Bluvft {
+  Approve : (spender: actor_id, amount: u128) -> result (bool, Error);
+  Transfer : (to: actor_id, amount: u128) -> result (bool, Error);
+  TransferFrom : (from: actor_id, to: actor_id, amount: u128) -> result (bool, Error);
+  query Allowance : (owner: actor_id, spender: actor_id) -> u128;
+  query BalanceOf : (account: actor_id) -> u128;
+  query Decimals : () -> u8;
+  query Name : () -> str;
+  query Symbol : () -> str;
+  query TotalSupply : () -> u128;
+
+  events {
+    Transfer: struct { from: actor_id, to: actor_id, amount: u128 };
+    Approval: struct { owner: actor_id, spender: actor_id, amount: u128 };
+    Minted: struct { to: actor_id, amount: u128 };
+    Burned: struct { from: actor_id, amount: u128 };
+  }
+};
+

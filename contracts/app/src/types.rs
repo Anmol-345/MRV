@@ -1,8 +1,5 @@
-use sails_rs::{
-    prelude::*,
-    ActorId,
-};
-use parity_scale_codec::{Encode, Decode};
+use parity_scale_codec::{Decode, Encode};
+use sails_rs::{prelude::*, ActorId};
 use scale_info::TypeInfo;
 
 pub type ProjectId = u64;
@@ -10,7 +7,7 @@ pub type ReportId = u64;
 pub type ListingId = u64;
 pub type RetirementId = u64;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Encode, Decode, TypeInfo)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Encode, Decode, TypeInfo)]
 pub enum Role {
     Admin,
     Verifier,
@@ -61,15 +58,15 @@ impl Default for Params {
         Self {
             quorum: 2,
             min_orgs: 2,
-            buffer_bps: 2000,       // 20%
-            platform_fee_bps: 200,   // 2%
+            buffer_bps: 2000,      // 20%
+            platform_fee_bps: 200, // 2%
             treasury: ActorId::zero(),
             paused: false,
         }
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Encode, Decode, TypeInfo)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Encode, Decode, TypeInfo)]
 pub enum Error {
     Unauthorized,
     Paused,

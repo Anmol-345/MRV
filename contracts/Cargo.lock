@@ -3846,6 +3846,7 @@ dependencies = [
  "hashbrown 0.15.5",
  "hex",
  "parity-scale-codec",
+ "sails-idl-gen",
  "sails-idl-meta",
  "sails-macros",
  "scale-info",
