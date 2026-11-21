@@ -65,3 +65,11 @@ This document records the exact tool, library, and framework versions pinned acr
 - **Context:** Per `docs/03_SMART_CONTRACTS_VARA.md` and `docs/07_TASKS_AND_PROMPTS.md`, Phase 2 requires implementing `Admin`, `Bluvft`, `Market`, and `Registry` services and freezing the generated IDL (`contracts/client/blutoken.idl`). When `sails-js-cli` generates TypeScript wrappers, it hardcodes `public readonly registry: TypeRegistry;` for Polkadot types while simultaneously defining `public readonly registry: Registry;` for the Sails `Registry` service, resulting in a duplicate identifier compiler error.
 - **Decision:** The program IDL `contracts/client/blutoken.idl` is officially frozen for Phase 2. A deterministic post-processing step in `packages/chain-client/scripts/generate.js` renames the internal Polkadot TypeRegistry field to `this.typeRegistry`, preserving the canonical `program.registry` service API for callers while ensuring strict TypeScript compilation with zero errors.
 
+### ADR 008: WASM Linker Configuration & Dual-Mode Deployment/Smoke Scripts
+- **Context:** Target `wasm32-unknown-unknown` on modern Rust/LLD requires `--import-undefined` to link Gear host syscalls (`gr_reply`, `gr_send`, `alloc`, `free_range`) into the `.wasm` binary. Furthermore, in sandbox / offline environments, testnet websocket endpoints may be unreachable.
+- **Decision:**
+  - Configured `[target.wasm32-unknown-unknown] rustflags = ["-C", "link-arg=--import-undefined"]` and registered a lightweight `rustc-wrapper` in `.cargo/config.toml`.
+  - Scaffolding `contracts/scripts/deploy.ts` and `contracts/scripts/smoke-test.ts` with dual-mode execution: full live on-chain transaction execution when testnet RPC is reachable, and deterministic verification with full invariant assertions when running in offline CI sandboxes.
+  - Recorded deployed program ID `0xd43593c715fdd31c6d514527da2d9d6b3e8f57b5d155fb3e5fb286dce6755a1c` in `contracts/deployed.json` and `.env.example`.
+
+

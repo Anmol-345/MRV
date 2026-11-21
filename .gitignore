@@ -11,6 +11,8 @@ dist/
 build/
 target/
 *.tsbuildinfo
+*.exe
+.binpath
 
 # Environment files
 .env

@@ -1,0 +1,26 @@
+{
+  "name": "@blutoken/contracts",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "deploy:program": "tsx scripts/deploy.ts",
+    "smoke": "tsx scripts/smoke-test.ts",
+    "build:wrapper": "rustc -O -o rustc-wrapper.exe rustc-wrapper.rs",
+    "build:wasm": "cargo build --manifest-path app/Cargo.toml --release"
+  },
+  "dependencies": {
+    "@blutoken/chain-client": "workspace:*",
+    "@gear-js/api": "^0.45.0",
+    "@polkadot/api": "^14.0.1",
+    "@polkadot/keyring": "^14.0.1",
+    "@polkadot/util": "^14.0.1",
+    "@polkadot/util-crypto": "^14.0.1",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}

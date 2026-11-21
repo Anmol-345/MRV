@@ -1,0 +1,5 @@
+[build]
+rustc-wrapper = "C:\\Users\\victus\\Documents\\My Codes\\MRV\\contracts\\rustc-wrapper.exe"
+
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "link-arg=--import-undefined"]

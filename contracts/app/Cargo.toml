@@ -5,6 +5,9 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 sails-rs = { workspace = true, features = ["gstd"] }
 parity-scale-codec = { workspace = true }

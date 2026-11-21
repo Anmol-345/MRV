@@ -1,0 +1,16 @@
+{
+  "programId": "0xd43593c715fdd31c6d514527da2d9d6b3e8f57b5d155fb3e5fb286dce6755a1c",
+  "network": "mock-local",
+  "rpcUrl": "wss://testnet.vara.network",
+  "deployerAddress": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+  "deployerActorId": "0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+  "timestamp": "2026-11-21T13:33:24.125Z",
+  "params": {
+    "quorum": 2,
+    "min_orgs": 2,
+    "buffer_bps": 2000,
+    "platform_fee_bps": 250,
+    "treasury": "0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",
+    "paused": false
+  }
+}

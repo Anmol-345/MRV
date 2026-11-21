@@ -17,9 +17,33 @@ Jobs: `contracts` (fmt, clippy, build wasm, test, regen IDL/client check) · `we
 
 ## 3. Deployment
 **Contracts**
-1. Build release WASM; record code hash.
-2. Upload code and create program on **testnet** with a script (Admin = a multisig-controlled account where possible).
-3. Grant roles; set params; verify via explorer; publish program id + IDL in repo and on the `/about` page.
+1. Build release WASM:
+   ```bash
+   pnpm --filter @blutoken/contracts run build:wasm
+   # Outputs optimized WASM at contracts/target/wasm32-unknown-unknown/release/blutoken_app.opt.wasm
+   ```
+2. Deploy program to **testnet**:
+   ```bash
+   pnpm contracts:deploy
+   ```
+   - Connects to `VARA_RPC_URL` (default: `wss://testnet.vara.network`).
+   - Uses `DEPLOYER_SEED` / `DEPLOYER_MNEMONIC` (falls back to dev `//Alice`).
+   - Uploads WASM, initializes `BluTokenProgram`, configures `Params` (quorum: 2, min_orgs: 2, buffer: 20%, fee: 2.5%), and grants pilot verifier roles (`//Bob` Org 1, `//Charlie` Org 2).
+   - Writes `contracts/deployed.json` and outputs program ID.
+
+3. Run end-to-end CLI smoke test:
+   ```bash
+   pnpm contracts:smoke
+   ```
+   Executes the full 7-step lifecycle:
+   - Step 1: `register_project` (Project owner registers project)
+   - Step 2: `activate_project` (Admin activates project)
+   - Step 3: `submit_report` (Project owner submits MRV report)
+   - Step 4: `vote_report` (2 verifiers from 2 distinct organizations vote approve -> verifies report & mints BLU with 20% buffer conservation)
+   - Step 5: `create_listing` (Project owner lists BLU credits on market)
+   - Step 6: `buy_and_retire` (Buyer purchases credits and retires with beneficiary certificate)
+   - Step 7: `claim_revenue` (Beneficiaries claim pull-payment revenue shares)
+
 4. Mainnet only after external audit and an NCCR/MoEFCC sign-off on methodology.
 Remember: programs are immutable; plan migration, keep a `version()` query.
 
