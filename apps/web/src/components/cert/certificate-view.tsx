@@ -53,9 +53,14 @@ export function CertificateView({ data }: CertificateViewProps) {
 
       {/* Certificate Frame */}
       <div className="relative bg-white border-8 border-deep-green/90 p-8 sm:p-12 rounded-3xl shadow-xl space-y-8 print:border-4 print:p-8 print:shadow-none print:m-0">
-        {/* Subtle Decorative Background Watermark */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none">
-          <Waves className="w-96 h-96 text-deep-green" />
+        {/* Subtle Decorative Background Nature Watermark */}
+        <div className="absolute inset-0 overflow-hidden opacity-[0.04] pointer-events-none select-none">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=1200&q=80"
+            alt="Mangrove delta watermark seal"
+            className="w-full h-full object-cover filter grayscale contrast-150"
+          />
         </div>
 
         {/* Certificate Top Header */}

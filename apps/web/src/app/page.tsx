@@ -11,6 +11,7 @@ interface SiteData {
   eco: string;
   blu: string;
   projectId: number;
+  imageUrl: string;
 }
 
 const SITES: Record<string, SiteData> = {
@@ -22,6 +23,8 @@ const SITES: Record<string, SiteData> = {
     eco: 'Mangrove - Avicennia marina',
     blu: '142,800.000 BLU',
     projectId: 1,
+    imageUrl:
+      'https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=800&q=80',
   },
   pichavaram: {
     state: 'Tamil Nadu • ID #1045',
@@ -31,6 +34,8 @@ const SITES: Record<string, SiteData> = {
     eco: 'Mangrove - Rhizophora apiculata',
     blu: '48,620.000 BLU',
     projectId: 2,
+    imageUrl:
+      'https://images.unsplash.com/photo-1618245318763-a15176d00133?auto=format&fit=crop&w=800&q=80',
   },
   mannar: {
     state: 'Tamil Nadu • ID #1049',
@@ -40,6 +45,8 @@ const SITES: Record<string, SiteData> = {
     eco: 'Seagrass - Cymodocea serrulata',
     blu: '112,400.000 BLU',
     projectId: 3,
+    imageUrl:
+      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
   },
   bhitarkanika: {
     state: 'Odisha • ID #1053',
@@ -49,6 +56,8 @@ const SITES: Record<string, SiteData> = {
     eco: 'Salt Marsh & Heritiera fomes',
     blu: '80,300.000 BLU',
     projectId: 4,
+    imageUrl:
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
   },
 };
 
@@ -252,46 +261,88 @@ export default function HomePage() {
 
         {/* Full-Width Interactive Map Module */}
         <div className="relative rounded-2xl overflow-hidden border border-outline-variant/80 shadow-lg bg-deep-canopy min-h-[520px]">
+          {/* Satellite Bathymetry & Coastal Ocean Texture from Unsplash */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://lh3.googleusercontent.com/aida/ALJJyrDnp2wXEHhsEqEIgkdVRShjtdR2_wc7SqYfj3RnyfppBEUvqjPVtlz9jdZaIhhqAhVGOd8Ltx5Q4RZJ6jtidwuR5VA6VNJh1VzFv2SmKOBX_qpnD93MglZzXCXJh-HWyu_Bskt2ZB_MWBAudm6gcB2BczKFnT9PmvLDuPfjvaXXTqLpntVyZKvY9Fv-o6BO-sKxhdtlH8Zc70auIMCS-929llYjMTrh1dcAvxU7AZQm6Mx4Kc1PL-PQoaFyg7csn7-BeBI"
-            alt="Satellite bathymetry map of India's eastern and southern coastline"
-            className="absolute inset-0 w-full h-full object-cover opacity-85"
+            src="https://images.unsplash.com/photo-1524654458049-e36be0721fa2?auto=format&fit=crop&w=1600&q=80"
+            alt="Satellite bathymetry and ocean currents along Indian coastline"
+            className="absolute inset-0 w-full h-full object-cover opacity-65"
           />
-          <div className="absolute inset-0 bg-deep-canopy/25" aria-hidden="true" />
+          <div className="absolute inset-0 bg-gradient-to-r from-deep-canopy/90 via-deep-canopy/40 to-deep-canopy/85 pointer-events-none" aria-hidden="true" />
 
-          {/* SVG Polygon Overlays */}
-          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1200 540" preserveAspectRatio="xMidYMid slice">
+          {/* SVG Vector Coastline & Bathymetric Shelf Contours */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1200 540" preserveAspectRatio="xMidYMid slice">
+            {/* Continental Shelf Depth Shading */}
+            <path
+              d="M 380 40 Q 420 180 470 280 T 520 420 T 480 540 L 1200 540 L 1200 40 Z"
+              fill="rgba(31, 111, 120, 0.22)"
+            />
+            {/* Depth Contour Lines (10m, 50m, 100m isobaths) */}
+            <path
+              d="M 410 40 Q 450 190 500 290 T 550 420 T 510 540"
+              stroke="#1F6F78"
+              strokeWidth="1.5"
+              strokeDasharray="6 4"
+              fill="none"
+              opacity="0.6"
+            />
+            <path
+              d="M 440 40 Q 480 210 530 310 T 580 420 T 540 540"
+              stroke="#8FB855"
+              strokeWidth="1.2"
+              strokeDasharray="4 4"
+              fill="none"
+              opacity="0.45"
+            />
+            <path
+              d="M 480 40 Q 520 230 570 330 T 620 420 T 580 540"
+              stroke="#8FB855"
+              strokeWidth="1"
+              strokeDasharray="2 3"
+              fill="none"
+              opacity="0.3"
+            />
+
+            {/* Indian East Coastline Contour */}
+            <path
+              d="M 360 40 Q 390 160 440 260 T 490 410 T 460 540"
+              stroke="#E8F2E2"
+              strokeWidth="2.5"
+              fill="none"
+              opacity="0.75"
+            />
+
+            {/* Polygon Overlays for the 4 Sanctuaries */}
             <polygon
               points="790,110 855,98 882,135 832,162 782,144"
-              fill="rgba(143, 184, 85, 0.35)"
+              fill="rgba(143, 184, 85, 0.45)"
               stroke="#8FB855"
               strokeWidth="2.5"
-              className="cursor-pointer hover:fill-opacity-50 transition-all"
+              className="pointer-events-auto cursor-pointer hover:fill-opacity-70 transition-all"
               onClick={() => setSelectedSiteKey('sundarbans')}
             />
             <polygon
               points="712,205 748,195 762,228 725,242"
-              fill="rgba(130, 98, 68, 0.4)"
+              fill="rgba(130, 98, 68, 0.45)"
               stroke="#F3ECE5"
               strokeWidth="2"
-              className="cursor-pointer hover:fill-opacity-50 transition-all"
+              className="pointer-events-auto cursor-pointer hover:fill-opacity-70 transition-all"
               onClick={() => setSelectedSiteKey('bhitarkanika')}
             />
             <polygon
               points="548,362 580,354 592,385 556,396"
-              fill="rgba(93, 147, 68, 0.4)"
+              fill="rgba(93, 147, 68, 0.45)"
               stroke="#8FB855"
               strokeWidth="2"
-              className="cursor-pointer hover:fill-opacity-50 transition-all"
+              className="pointer-events-auto cursor-pointer hover:fill-opacity-70 transition-all"
               onClick={() => setSelectedSiteKey('pichavaram')}
             />
             <polygon
               points="502,438 545,428 558,458 510,468"
-              fill="rgba(31, 111, 120, 0.45)"
+              fill="rgba(31, 111, 120, 0.5)"
               stroke="#E0F0F2"
               strokeWidth="2"
-              className="cursor-pointer hover:fill-opacity-50 transition-all"
+              className="pointer-events-auto cursor-pointer hover:fill-opacity-70 transition-all"
               onClick={() => setSelectedSiteKey('mannar')}
             />
           </svg>
@@ -300,57 +351,57 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => setSelectedSiteKey('sundarbans')}
-            className={`absolute z-10 top-[19%] left-[67%] inline-flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-md transition-colors ${
+            className={`absolute z-10 top-[19%] left-[67%] inline-flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-md transition-all ${
               selectedSiteKey === 'sundarbans'
-                ? 'bg-deep-canopy text-on-deep-canopy border-shoot-lime ring-2 ring-shoot-lime/40'
+                ? 'bg-deep-canopy text-on-deep-canopy border-shoot-lime ring-2 ring-shoot-lime/50 scale-105'
                 : 'bg-surface-card text-on-surface border-outline-variant hover:bg-primary-container'
             }`}
           >
-            <span className="w-2.5 h-2.5 rounded-full bg-shoot-lime" aria-hidden="true" />
+            <span className="w-2.5 h-2.5 rounded-full bg-shoot-lime animate-pulse" aria-hidden="true" />
             <span className="font-label text-xs font-semibold">Sundarbans (WB)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSelectedSiteKey('bhitarkanika')}
-            className={`absolute z-10 top-[37%] left-[59%] inline-flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-md transition-colors ${
+            className={`absolute z-10 top-[37%] left-[59%] inline-flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-md transition-all ${
               selectedSiteKey === 'bhitarkanika'
-                ? 'bg-deep-canopy text-on-deep-canopy border-shoot-lime ring-2 ring-shoot-lime/40'
+                ? 'bg-deep-canopy text-on-deep-canopy border-shoot-lime ring-2 ring-shoot-lime/50 scale-105'
                 : 'bg-surface-card text-on-surface border-outline-variant hover:bg-primary-container'
             }`}
           >
-            <span className="w-2.5 h-2.5 rounded-full bg-rhizome-earth" aria-hidden="true" />
+            <span className="w-2.5 h-2.5 rounded-full bg-rhizome-earth animate-pulse" aria-hidden="true" />
             <span className="font-label text-xs font-semibold">Bhitarkanika (OD)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSelectedSiteKey('pichavaram')}
-            className={`absolute z-10 top-[66%] left-[46%] inline-flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-md transition-colors ${
+            className={`absolute z-10 top-[66%] left-[46%] inline-flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-md transition-all ${
               selectedSiteKey === 'pichavaram'
-                ? 'bg-deep-canopy text-on-deep-canopy border-shoot-lime ring-2 ring-shoot-lime/40'
+                ? 'bg-deep-canopy text-on-deep-canopy border-shoot-lime ring-2 ring-shoot-lime/50 scale-105'
                 : 'bg-surface-card text-on-surface border-outline-variant hover:bg-primary-container'
             }`}
           >
-            <span className="w-2.5 h-2.5 rounded-full bg-living-leaf" aria-hidden="true" />
+            <span className="w-2.5 h-2.5 rounded-full bg-living-leaf animate-pulse" aria-hidden="true" />
             <span className="font-label text-xs font-semibold">Pichavaram (TN)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSelectedSiteKey('mannar')}
-            className={`absolute z-10 top-[81%] left-[42%] inline-flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-md transition-colors ${
+            className={`absolute z-10 top-[81%] left-[42%] inline-flex items-center gap-2 px-3 py-1.5 rounded-full border shadow-md transition-all ${
               selectedSiteKey === 'mannar'
-                ? 'bg-deep-canopy text-on-deep-canopy border-shoot-lime ring-2 ring-shoot-lime/40'
+                ? 'bg-deep-canopy text-on-deep-canopy border-shoot-lime ring-2 ring-shoot-lime/50 scale-105'
                 : 'bg-surface-card text-on-surface border-outline-variant hover:bg-primary-container'
             }`}
           >
-            <span className="w-2.5 h-2.5 rounded-full bg-tidal-teal" aria-hidden="true" />
+            <span className="w-2.5 h-2.5 rounded-full bg-tidal-teal animate-pulse" aria-hidden="true" />
             <span className="font-label text-xs font-semibold">Gulf of Mannar (TN)</span>
           </button>
 
-          {/* Left Site Selector List */}
-          <div className="hidden md:flex z-20 flex-col gap-2 absolute top-6 left-6 w-72 bg-surface-card/95 backdrop-blur-md rounded-xl p-4 border border-outline-variant/70 shadow-lg">
+          {/* Left Site Selector List with Photo Avatars */}
+          <div className="hidden md:flex z-20 flex-col gap-2 absolute top-6 left-6 w-80 bg-surface-card/95 backdrop-blur-md rounded-2xl p-4 border border-outline-variant/70 shadow-xl">
             <span className="font-label text-xs font-semibold text-botanical-muted uppercase tracking-wider">
               Registered Sanctuaries (4)
             </span>
@@ -361,69 +412,100 @@ export default function HomePage() {
                   key={key}
                   type="button"
                   onClick={() => setSelectedSiteKey(key)}
-                  className={`text-left px-3 py-2 rounded-lg flex items-center justify-between transition-colors ${
+                  className={`text-left px-3 py-2 rounded-xl flex items-center justify-between gap-3 transition-all ${
                     isActive
-                      ? 'bg-primary-container text-on-primary-container font-semibold'
+                      ? 'bg-primary-container text-on-primary-container font-semibold shadow-sm'
                       : 'hover:bg-surface-container-low text-on-surface'
                   }`}
                 >
-                  <span className="font-label text-xs truncate pr-2">{site.name}</span>
-                  <span className="font-mono text-xs text-botanical-muted">{site.state.split(' • ')[0]}</span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={site.imageUrl}
+                      alt={site.name}
+                      className="w-8 h-8 rounded-lg object-cover shrink-0 border border-outline-variant/60 shadow-xs"
+                    />
+                    <span className="font-label text-xs truncate">{site.name}</span>
+                  </div>
+                  <span className="font-mono text-[10px] text-botanical-muted shrink-0">
+                    {site.state.split(' • ')[0]}
+                  </span>
                 </button>
               );
             })}
           </div>
 
-          {/* Interactive Hover / Telemetry Card */}
-          <aside className="relative z-20 m-4 mt-72 md:m-0 md:absolute md:bottom-6 md:right-6 w-auto md:w-full max-w-sm bg-surface-card rounded-2xl border border-outline-variant p-6 shadow-xl">
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <div>
-                <span className="font-label text-xs font-semibold text-tidal-teal">{currentSite.state}</span>
-                <h3 className="font-title text-base sm:text-lg font-bold text-on-surface leading-snug mt-0.5">{currentSite.name}</h3>
-              </div>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-living-leaf-container text-on-living-leaf-container shrink-0 text-xs font-semibold">
-                <span className="w-2 h-2 rounded-full bg-living-leaf" aria-hidden="true" />
-                <span>Verified</span>
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5 mb-4">
-              <div className="bg-surface-container-low rounded-xl p-2.5">
-                <span className="font-label text-[11px] text-botanical-muted block">Area</span>
-                <span className="font-title text-sm font-bold text-on-surface tabular-nums">{currentSite.area}</span>
-              </div>
-              <div className="bg-surface-container-low rounded-xl p-2.5">
-                <span className="font-label text-[11px] text-botanical-muted block">Canopy Health</span>
-                <span className="font-title text-sm font-bold text-primary tabular-nums">{currentSite.ndvi}</span>
-              </div>
-              <div className="col-span-2 bg-surface-container-low rounded-xl p-2.5">
-                <span className="font-label text-[11px] text-botanical-muted block">Ecosystem</span>
-                <span className="font-body text-xs font-medium text-on-surface">{currentSite.eco}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between gap-2 text-xs py-2 border-t border-outline-variant/60 mb-4">
-              <div>
-                <span className="font-label text-[11px] text-botanical-muted block">Total BLU Minted</span>
-                <span className="font-mono text-xs font-semibold text-on-surface tabular-nums">{currentSite.blu}</span>
-              </div>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rhizome-earth-container text-on-rhizome-earth-container shrink-0 text-xs font-semibold">
-                <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
-                  lock
+          {/* Interactive Hover / Telemetry Card with Nature Thumbnail */}
+          <aside className="relative z-20 m-4 mt-72 md:m-0 md:absolute md:bottom-6 md:right-6 w-auto md:w-full max-w-sm bg-surface-card rounded-2xl border border-outline-variant/80 overflow-hidden shadow-2xl">
+            {/* Sanctuary Image Banner */}
+            <div className="relative h-28 w-full overflow-hidden bg-deep-canopy">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={currentSite.imageUrl}
+                alt={currentSite.name}
+                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-surface-card via-surface-card/25 to-transparent" />
+              <div className="absolute top-2.5 right-2.5">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-deep-canopy/80 backdrop-blur-md text-shoot-lime border border-shoot-lime/30 text-[11px] font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-shoot-lime animate-pulse" />
+                  <span>Sentinel-2 L2A</span>
                 </span>
-                <span>20% Buffer</span>
-              </span>
+              </div>
             </div>
 
-            <Link
-              href={`/projects/${currentSite.projectId}`}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-on-primary hover:bg-deep-canopy transition-all font-semibold text-xs shadow-sm"
-            >
-              <span>Open MRV Telemetry</span>
-              <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
-                open_in_new
-              </span>
-            </Link>
+            <div className="p-5 pt-3">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div>
+                  <span className="font-label text-xs font-semibold text-tidal-teal">{currentSite.state}</span>
+                  <h3 className="font-title text-base font-bold text-on-surface leading-snug mt-0.5">
+                    {currentSite.name}
+                  </h3>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-living-leaf-container text-on-living-leaf-container shrink-0 text-xs font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-living-leaf" aria-hidden="true" />
+                  <span>Verified</span>
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="bg-surface-container-low rounded-xl p-2.5">
+                  <span className="font-label text-[11px] text-botanical-muted block">Area</span>
+                  <span className="font-title text-sm font-bold text-on-surface tabular-nums">{currentSite.area}</span>
+                </div>
+                <div className="bg-surface-container-low rounded-xl p-2.5">
+                  <span className="font-label text-[11px] text-botanical-muted block">Canopy Health</span>
+                  <span className="font-title text-sm font-bold text-primary tabular-nums">{currentSite.ndvi}</span>
+                </div>
+                <div className="col-span-2 bg-surface-container-low rounded-xl p-2.5">
+                  <span className="font-label text-[11px] text-botanical-muted block">Ecosystem</span>
+                  <span className="font-body text-xs font-medium text-on-surface">{currentSite.eco}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between gap-2 text-xs py-2 border-t border-outline-variant/60 mb-3">
+                <div>
+                  <span className="font-label text-[11px] text-botanical-muted block">Total BLU Minted</span>
+                  <span className="font-mono text-xs font-semibold text-on-surface tabular-nums">{currentSite.blu}</span>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rhizome-earth-container text-on-rhizome-earth-container shrink-0 text-xs font-semibold">
+                  <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
+                    lock
+                  </span>
+                  <span>20% Buffer</span>
+                </span>
+              </div>
+
+              <Link
+                href={`/projects/${currentSite.projectId}`}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-on-primary hover:bg-deep-canopy transition-all font-semibold text-xs shadow-sm"
+              >
+                <span>Open MRV Telemetry</span>
+                <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
+                  open_in_new
+                </span>
+              </Link>
+            </div>
           </aside>
         </div>
       </section>

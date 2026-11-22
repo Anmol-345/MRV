@@ -30,10 +30,34 @@ export default function CitizenReportingPwaPage() {
   const [submittedMessage, setSubmittedMessage] = useState<string | null>(null);
 
   const categories = [
-    { id: 'felling', name: 'Illegal Mangrove Felling', icon: 'carpenter', color: 'text-rhizome-earth' },
-    { id: 'erosion', name: 'Bund Erosion / Tidal Breach', icon: 'waves', color: 'text-tidal-teal' },
-    { id: 'debris', name: 'Oil / Plastic Debris', icon: 'oil_barrel', color: 'text-rhizome-earth' },
-    { id: 'wildlife', name: 'Unusual Wildlife / Crab Mortality', icon: 'pest_control', color: 'text-living-leaf' },
+    {
+      id: 'felling',
+      name: 'Illegal Mangrove Felling',
+      icon: 'carpenter',
+      color: 'text-rhizome-earth',
+      imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      id: 'erosion',
+      name: 'Bund Erosion / Tidal Breach',
+      icon: 'waves',
+      color: 'text-tidal-teal',
+      imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      id: 'debris',
+      name: 'Oil / Plastic Debris',
+      icon: 'oil_barrel',
+      color: 'text-rhizome-earth',
+      imageUrl: 'https://images.unsplash.com/photo-1618477247222-acbdb0e159b3?auto=format&fit=crop&w=400&q=80',
+    },
+    {
+      id: 'wildlife',
+      name: 'Unusual Wildlife / Crab Mortality',
+      icon: 'pest_control',
+      color: 'text-living-leaf',
+      imageUrl: 'https://images.unsplash.com/photo-1559827291-72ee739d0d9a?auto=format&fit=crop&w=400&q=80',
+    },
   ];
 
   const handleSubmit = async () => {
@@ -94,9 +118,8 @@ export default function CitizenReportingPwaPage() {
                   key={code}
                   type="button"
                   onClick={() => setLang(code)}
-                  className={`px-2 py-0.5 rounded-full font-label text-label-sm transition-colors ${
-                    isActive ? 'bg-shoot-lime text-on-shoot-lime' : 'text-on-deep-canopy'
-                  }`}
+                  className={`px-2 py-0.5 rounded-full font-label text-label-sm transition-colors ${isActive ? 'bg-shoot-lime text-on-shoot-lime' : 'text-on-deep-canopy'
+                    }`}
                 >
                   {labels[code]}
                 </button>
@@ -108,11 +131,10 @@ export default function CitizenReportingPwaPage() {
         <div className="flex items-center justify-between mt-2.5">
           {/* Offline / Online Indicator Pill */}
           <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-label text-label-sm ${
-              isOnline
-                ? 'bg-living-leaf-container text-on-living-leaf-container'
-                : 'bg-rhizome-earth-container text-on-rhizome-earth-container'
-            }`}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-label text-label-sm ${isOnline
+              ? 'bg-living-leaf-container text-on-living-leaf-container'
+              : 'bg-rhizome-earth-container text-on-rhizome-earth-container'
+              }`}
           >
             <span
               className={`w-2 h-2 rounded-full ${isOnline ? 'bg-living-leaf' : 'bg-rhizome-earth'}`}
@@ -167,7 +189,7 @@ export default function CitizenReportingPwaPage() {
           </div>
         </section>
 
-        {/* Category Selection Grid (2x2 Tactile Icon Buttons from Stitch) */}
+        {/* Category Selection Grid (2x2 Tactile Icon & Photo Buttons from Stitch) */}
         <section className="flex flex-col gap-2">
           <span className="font-label text-label-md text-on-surface">Select Incident Category</span>
           <div className="grid grid-cols-2 gap-3">
@@ -178,16 +200,29 @@ export default function CitizenReportingPwaPage() {
                   key={cat.id}
                   type="button"
                   onClick={() => setSelectedCat(cat.name)}
-                  className={`text-left rounded-lg p-3.5 flex flex-col gap-2 shadow-sm transition-all ${
+                  className={`text-left rounded-xl overflow-hidden shadow-sm transition-all group flex flex-col justify-between ${
                     isSelected
-                      ? 'bg-primary-container border-2 border-primary'
+                      ? 'bg-primary-container border-2 border-primary ring-2 ring-primary/20'
                       : 'bg-surface-card border border-outline-variant hover:border-primary'
                   }`}
                 >
-                  <span className={`material-symbols-outlined text-[24px] ${cat.color}`} aria-hidden="true">
-                    {cat.icon}
-                  </span>
-                  <span className="font-label text-label-md text-on-surface leading-snug">{cat.name}</span>
+                  <div className="relative h-16 w-full overflow-hidden bg-deep-canopy">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={cat.imageUrl}
+                      alt={cat.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-deep-canopy/80 via-transparent to-transparent" />
+                    <span className={`material-symbols-outlined text-[20px] text-white absolute bottom-1.5 left-2`} aria-hidden="true">
+                      {cat.icon}
+                    </span>
+                  </div>
+                  <div className="p-2.5">
+                    <span className="font-label text-xs font-semibold text-on-surface leading-snug line-clamp-2">
+                      {cat.name}
+                    </span>
+                  </div>
                 </button>
               );
             })}
@@ -201,11 +236,10 @@ export default function CitizenReportingPwaPage() {
             <button
               type="button"
               onClick={() => setIsRecording(!isRecording)}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-label text-label-sm transition-colors ${
-                isRecording
-                  ? 'bg-error-container text-on-error-container animate-pulse'
-                  : 'bg-primary-container text-on-primary-container'
-              }`}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-label text-label-sm transition-colors ${isRecording
+                ? 'bg-error-container text-on-error-container animate-pulse'
+                : 'bg-primary-container text-on-primary-container'
+                }`}
             >
               <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
                 mic

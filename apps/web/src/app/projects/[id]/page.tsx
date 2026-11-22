@@ -290,6 +290,75 @@ export default function ProjectDetailPage({
               </div>
             </div>
           </article>
+
+          {/* Field MRV & Drone Orthomosaic Gallery */}
+          <article className="bg-surface-card rounded-2xl border border-outline-variant/60 p-6 shadow-[0_4px_20px_rgba(27,56,43,0.04)] flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-headline text-lg sm:text-xl font-bold text-on-surface">Field MRV &amp; Drone Orthomosaic Plots</h2>
+                <p className="font-body text-xs text-botanical-muted">High-resolution ground truth validation images from Sundarbans Sector A-4</p>
+              </div>
+              <span className="font-mono text-xs text-primary font-semibold px-2.5 py-1 rounded-full bg-primary-container">
+                3 Field Stations
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="group rounded-xl overflow-hidden border border-outline-variant/60 bg-deep-canopy flex flex-col">
+                <div className="relative h-28 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="https://images.unsplash.com/photo-1618245318763-a15176d00133?auto=format&fit=crop&w=600&q=80"
+                    alt="Rhizophora prop root density plot"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-deep-canopy/80 backdrop-blur-md text-[10px] font-semibold text-shoot-lime">
+                    Plot A-4.1
+                  </span>
+                </div>
+                <div className="p-2.5 bg-surface-card flex-1">
+                  <span className="font-title text-xs font-semibold text-on-surface block">Stilt Root Density</span>
+                  <span className="font-mono text-[11px] text-botanical-muted block">8.4 roots / m²</span>
+                </div>
+              </div>
+
+              <div className="group rounded-xl overflow-hidden border border-outline-variant/60 bg-deep-canopy flex flex-col">
+                <div className="relative h-28 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=600&q=80"
+                    alt="Tidal creek hydrology channel"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-deep-canopy/80 backdrop-blur-md text-[10px] font-semibold text-tidal-teal">
+                    Plot A-4.2
+                  </span>
+                </div>
+                <div className="p-2.5 bg-surface-card flex-1">
+                  <span className="font-title text-xs font-semibold text-on-surface block">Intertidal Creek Flow</span>
+                  <span className="font-mono text-[11px] text-botanical-muted block">24.2 ppt Salinity</span>
+                </div>
+              </div>
+
+              <div className="group rounded-xl overflow-hidden border border-outline-variant/60 bg-deep-canopy flex flex-col">
+                <div className="relative h-28 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80"
+                    alt="Sentinel-2 L2A orbital multispectral frame"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-deep-canopy/80 backdrop-blur-md text-[10px] font-semibold text-shoot-lime">
+                    Sentinel-2 L2A
+                  </span>
+                </div>
+                <div className="p-2.5 bg-surface-card flex-1">
+                  <span className="font-title text-xs font-semibold text-on-surface block">NIR &amp; RedEdge Band</span>
+                  <span className="font-mono text-[11px] text-botanical-muted block">10m Ground Resolution</span>
+                </div>
+              </div>
+            </div>
+          </article>
         </div>
 
         {/* Right Column: On-Chain MRV Verification Queue */}
