@@ -135,7 +135,7 @@ export default function CitizenReportingPwaPage() {
         <section className="relative rounded-xl overflow-hidden border border-outline-variant shadow-sm h-56 bg-deep-canopy">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://lh3.googleusercontent.com/aida/ALJJyrDN3x1eEz-HH1Tgklv1xpSSMlZTPFzNMbzsebbfOyCCS2ngjePaWTgtX6Lwr_I92uAuWuAJh7Mgki1ROrFDCw_1rzhPPZlgQ7bz41a9BG1p_J6CFPYitbHrauBmDF0zivE_-cfsvFjjZ0NyxQHgyrlWWkCd-n5m1pfWvX53pK42fmeQ0VD-mwXV84rXFoMapJ_mUT1qu8tqjAGnhjLBrQO_EllQbQqcKpkYu7Bd42IDVZ_o5ac42xpDv4kgMTpG5eRc6g"
+            src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=800&q=80"
             alt="Viewfinder showing Sundarbans mangrove shoreline"
             className="w-full h-full object-cover"
           />

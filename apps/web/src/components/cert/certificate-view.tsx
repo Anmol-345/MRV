@@ -24,7 +24,8 @@ interface CertificateViewProps {
 }
 
 export function CertificateView({ data }: CertificateViewProps) {
-  const explorerUrl = `https://idea.gear-tech.io/programs?node=wss%3A%2F%2Ftestnet.vara.network`;
+  const explorerUrl =
+    'https://idea.gear-tech.io/programs/0x562a96cc072e97bc223e48d75e384654978682501b2b8eb29a94189a67026f6a?node=wss%3A%2F%2Frpc.vara.network';
   const amountFormatted = formatBlu(BigInt(data.amountMilli || '0'));
 
   const handlePrint = () => {

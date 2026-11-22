@@ -25,7 +25,7 @@ const INITIAL_LISTINGS: ListingItem[] = [
     available: '450.000 BLU',
     unitPrice: 42.5,
     imageUrl:
-      'https://lh3.googleusercontent.com/aida/ALJJyrDcMxFTZrx9jRQJYtEOIa04dKI69lE9xY9LUe2fcR3MFRbeJCHetbnRRMWpHK719l7OTJnklygZviRxhhWSf_zj-_eBYlvZDlN-tdGeYs34r_XuuJFKvFgGv_dgnE0d2OqY4ukxFrK1a0DfgAR4xa7PHGpeJy5RXNDRmSa4ZGrEjBITfhO9TOSE1GnZ6UB73AHsIMrewt8QtUQ3yuoX26kdA40x_fl0zxIaCg1JF2rcb-eynmuDonCF9H2z7tA2jBg',
+      'https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: '2',
@@ -37,7 +37,7 @@ const INITIAL_LISTINGS: ListingItem[] = [
     available: '320.000 BLU',
     unitPrice: 39.0,
     imageUrl:
-      'https://lh3.googleusercontent.com/aida/ALJJyrBIiOVgGxQAMk9HvemTh7Hx5Qs4B3ZGmRfvWWgGwa1hn18WY9adpoa76aljIPbEIIEAWp0RIJtsunk4clM1urYJu3KHwpB_hJse1Y-uga2dhtafqyLAtdCeTJbuv0RleG70yh3djY5t8nOVVUZM3WDUOXba95l93qbIIX0sbtD5Vom43POELOEZVQwJe--h4F3TmCZHp8kci6dphiNRqNfFVNfT7EOnqfyB7JSFOQ3BaJ6A93oZSBagtzsq',
+      'https://images.unsplash.com/photo-1618245318763-a15176d00133?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: '3',
@@ -49,7 +49,7 @@ const INITIAL_LISTINGS: ListingItem[] = [
     available: '615.000 BLU',
     unitPrice: 44.0,
     imageUrl:
-      'https://lh3.googleusercontent.com/aida/ALJJyrDDplRaOCqsD16kAI2yy8sZ6EOnwmdHLE2he7H5Sh3kfUsxQw4KcnzxK7144dQFeanUR6Y5bBNCLsDBjou-UuBaJ-1Wb3YphdgN21MejywZsHxVL-nig2HABS-ZJqzWENtXNC6Rlha60zNcijVw5oPoJzC15Bsol3aFfy9xhmXKtVDEpWh7hNQwn_1Ai3ZvHVizAjta4djYj2F9BDRWMqsSPT4d4GwEn2ls8sg0WyjwqtiVWG9k8NSs_85An2U',
+      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: '4',
@@ -61,7 +61,7 @@ const INITIAL_LISTINGS: ListingItem[] = [
     available: '280.000 BLU',
     unitPrice: 37.5,
     imageUrl:
-      'https://lh3.googleusercontent.com/aida/ALJJyrB77m5ayeAqXA8Etm3Jj92YG070psL9ZnFNxpH8X-YuSPJqrQ72MRYR-XSll3XaoblM_S8jG9zLYSt31AfXgdkv9MkrDr_uxmGpnZgrrB6XJ2SbuSvV3vajJzfKtsVh4EI86NA0R5DmjD-8wQVgRWLkAlt9MWlIlWiTXxEjwKQLFEq05kWrGior2NRJEwRDL0ML5R2s1isizADt_UWJnwhjodT5YAq9GOR8zDPOdgW_Lxk7VqeSlFGFOU3hWkll8w',
+      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
   },
 ];
 
@@ -96,34 +96,48 @@ export default function MarketPage() {
   };
 
   return (
-    <main id="marketplace" className="flex-1 max-w-[1280px] w-full mx-auto px-gutter-md sm:px-gutter-xl py-gutter-xl flex flex-col gap-section">
-      {/* Marketplace Header & Filter Pills from Stitch */}
-      <section className="flex flex-col gap-gutter-md">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-gutter-md">
-          <div>
-            <h1 className="font-headline text-headline-lg-mobile md:text-headline-lg text-on-surface mb-gutter-xs">
+    <main id="marketplace" className="flex-1 max-w-[1360px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col gap-8 md:gap-12">
+      {/* Nature Banner Header */}
+      <section className="relative rounded-2xl overflow-hidden bg-deep-canopy text-on-deep-canopy p-6 sm:p-10 shadow-lg border border-outline-variant/60">
+        {/* Background Nature Imagery - Underwater Seagrass & Coastal Mangroves */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1600&q=80"
+          alt="Sunlit coastal blue carbon ecosystem waters"
+          className="absolute inset-0 w-full h-full object-cover opacity-25"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-deep-canopy/95 via-deep-canopy/80 to-deep-canopy/65" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-card/15 backdrop-blur-md border border-on-deep-canopy/20 text-xs font-semibold text-shoot-lime">
+              <span className="material-symbols-outlined text-[16px]">storefront</span>
+              <span>VERIFIED OFFSETS • INSTANT ON-CHAIN RETIREMENT</span>
+            </div>
+            <h1 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-bold text-on-deep-canopy tracking-tight">
               Blue Carbon Credit Marketplace
             </h1>
-            <p className="font-body text-body-md text-botanical-muted">
-              Purchase and permanently retire Sentinel-2 verified BLU credits on Vara Network.
+            <p className="font-body text-sm sm:text-base text-on-deep-canopy/85 leading-relaxed">
+              Purchase and permanently retire Sentinel-2 verified BLU credits on Vara Network. Direct algorithmic revenue distribution to coastal Gram Panchayats.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
             {[
               { id: 'all', label: 'All Ecosystems' },
-              { id: 'mangrove', label: 'Mangrove' },
+              { id: 'mangrove', label: 'Mangroves' },
               { id: 'seagrass', label: 'Seagrass' },
               { id: 'saltmarsh', label: 'Salt Marsh' },
-              { id: 'vintage', label: 'Vintage 2025/2026' },
+              { id: 'vintage', label: 'Vintage 2026' },
             ].map((btn) => (
               <button
                 key={btn.id}
                 type="button"
                 onClick={() => setFilterEco(btn.id)}
-                className={`px-4 py-2 rounded-full font-label text-label-md transition-colors ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all backdrop-blur-md ${
                   filterEco === btn.id
-                    ? 'bg-primary text-on-primary shadow-sm'
-                    : 'bg-surface-card text-on-surface border border-outline-variant hover:bg-primary-container'
+                    ? 'bg-shoot-lime text-on-shoot-lime shadow-sm'
+                    : 'bg-surface-card/15 text-on-deep-canopy border border-on-deep-canopy/25 hover:bg-surface-card/25'
                 }`}
               >
                 {btn.label}
@@ -131,9 +145,12 @@ export default function MarketPage() {
             ))}
           </div>
         </div>
+      </section>
 
+      {/* Marketplace Section */}
+      <section className="flex flex-col gap-6">
         {/* Marketplace Listing Grid (4 Cards) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter-lg items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
           {filteredListings.map((item) => (
             <article
               key={item.id}

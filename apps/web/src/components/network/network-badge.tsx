@@ -2,26 +2,28 @@
 
 import React from 'react';
 import { useApi } from '@gear-js/react-hooks';
-import { Activity } from 'lucide-react';
 
 export function NetworkBadge() {
   const { isApiReady } = useApi();
+  const endpoint = process.env.NEXT_PUBLIC_VARA_WS || 'wss://rpc.vara.network';
+  const isMainnet = endpoint.includes('rpc.vara.network');
+  const label = isMainnet ? 'Vara Mainnet' : 'Vara Testnet';
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors shrink-0 ${
         isApiReady
-          ? 'bg-leaf/15 text-leaf border border-leaf/30'
-          : 'bg-earth/15 text-earth border border-earth/30'
+          ? 'bg-living-leaf-container text-on-living-leaf-container border border-living-leaf/30'
+          : 'bg-surface-container-low text-botanical-muted border border-outline-variant/60'
       }`}
-      title={isApiReady ? 'Connected to Vara Testnet' : 'Connecting to Vara Testnet...'}
+      title={isApiReady ? `Connected to ${label}` : `Connecting to ${label}...`}
     >
       <span
         className={`w-2 h-2 rounded-full ${
-          isApiReady ? 'bg-leaf animate-pulse' : 'bg-earth'
+          isApiReady ? 'bg-living-leaf animate-pulse' : 'bg-outline'
         }`}
       />
-      <span className="hidden sm:inline">Vara Testnet</span>
+      <span className="hidden sm:inline">{label}</span>
     </div>
   );
 }

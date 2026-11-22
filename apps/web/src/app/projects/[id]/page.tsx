@@ -19,7 +19,7 @@ export default function ProjectDetailPage({
   };
 
   return (
-    <main id="telemetry" className="flex-1 max-w-[1280px] w-full mx-auto px-gutter-md sm:px-gutter-xl py-gutter-xl flex flex-col gap-gutter-lg">
+    <main id="telemetry" className="flex-1 max-w-[1360px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col gap-8">
       {/* Breadcrumb from Stitch */}
       <div className="flex items-center gap-2 text-botanical-muted">
         <Link href="/projects" className="hover:text-primary transition-colors font-label text-label-md">
@@ -33,93 +33,106 @@ export default function ProjectDetailPage({
         </span>
       </div>
 
-      {/* Project Header Card */}
-      <section className="bg-surface-card text-on-surface-card rounded-xl border border-outline-variant/60 p-gutter-lg sm:p-gutter-xl shadow-[0_4px_20px_rgba(27,56,43,0.04)] flex flex-col gap-gutter-lg">
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-gutter-md">
-          <div className="flex flex-col gap-gutter-sm">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-tidal-teal-container text-on-tidal-teal-container border border-tidal-teal/20 font-label text-label-sm">
-                Mangrove - Rhizophora &amp; Avicennia
-              </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-low text-on-surface border border-outline-variant/60 font-label text-label-sm">
-                State: WB
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-living-leaf-container text-on-living-leaf-container border border-living-leaf/25 font-label text-label-sm">
-                <span className="w-2 h-2 rounded-full bg-living-leaf" aria-hidden="true" />
-                <span>Status: Active</span>
-              </span>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-low text-botanical-muted border border-outline-variant/60 font-mono text-mono-sm">
-                ID: #{id === '1' ? '1042' : id}
-              </span>
-            </div>
-            <h1 className="font-headline text-headline-lg-mobile md:text-headline-lg text-on-surface text-balance">
-              Sundarbans Delta Zone A-4 Mangrove Restoration Project
-            </h1>
-          </div>
-
-          <Link
-            href="/market"
-            className="inline-flex items-center justify-center gap-gutter-sm px-gutter-lg py-3 rounded-md bg-primary text-on-primary hover:bg-deep-canopy transition-colors duration-state-change shrink-0 font-label text-label-lg shadow-sm"
-          >
-            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
-              eco
-            </span>
-            <span>Retire Zone A-4 Credits</span>
-          </Link>
+      {/* Project Header Card with Nature Backdrop */}
+      <section className="relative rounded-2xl overflow-hidden bg-surface-card border border-outline-variant/60 shadow-[0_4px_20px_rgba(27,56,43,0.04)]">
+        {/* Subtle Mangrove Nature Accent Banner */}
+        <div className="relative h-32 sm:h-40 overflow-hidden bg-deep-canopy">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=1600&q=80"
+            alt="Sundarbans mangrove coastal canopy"
+            className="w-full h-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-surface-card via-deep-canopy/40 to-transparent" />
         </div>
 
-        {/* Beneficiary Distribution Strip */}
-        <div className="pt-gutter-md border-t border-outline-variant/50 flex flex-col gap-2.5">
-          <div className="flex items-center justify-between">
-            <span className="font-label text-label-md text-on-surface">On-Chain Panchayat &amp; Co-op Revenue Split</span>
-            <span className="font-mono text-mono-sm text-botanical-muted">Automated Smart Contract Split (100%)</span>
-          </div>
-          <div className="w-full h-3.5 rounded-full overflow-hidden flex gap-0.5 bg-surface-container">
-            <div className="h-full bg-primary w-[45%]" title="Mouli Honey Collector Co-op (45%)" />
-            <div className="h-full bg-tidal-teal w-[35%]" title="Gosaba Forest Protection Samiti (35%)" />
-            <div className="h-full bg-rhizome-earth w-[20%]" title="Community Buffer Reserve (20%)" />
-          </div>
-          <div className="flex flex-wrap items-center gap-gutter-lg pt-1">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-primary" aria-hidden="true" />
-              <span className="font-body text-body-md text-on-surface">Mouli Honey Collector Co-op (45%)</span>
+        <div className="p-6 sm:p-8 -mt-12 relative z-10 flex flex-col gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-tidal-teal-container text-on-tidal-teal-container border border-tidal-teal/20 font-label text-label-sm font-semibold">
+                  Mangrove - Rhizophora &amp; Avicennia
+                </span>
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-low text-on-surface border border-outline-variant/60 font-label text-label-sm font-semibold">
+                  State: WB
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-living-leaf-container text-on-living-leaf-container border border-living-leaf/25 font-label text-label-sm font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-living-leaf" aria-hidden="true" />
+                  <span>Status: Active</span>
+                </span>
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-low text-botanical-muted border border-outline-variant/60 font-mono text-mono-sm">
+                  ID: #{id === '1' ? '1042' : id}
+                </span>
+              </div>
+              <h1 className="font-headline text-2xl sm:text-3xl lg:text-4xl font-bold text-on-surface text-balance">
+                Sundarbans Delta Zone A-4 Mangrove Restoration Project
+              </h1>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-tidal-teal" aria-hidden="true" />
-              <span className="font-body text-body-md text-on-surface">Gosaba Forest Protection Samiti (35%)</span>
+
+            <Link
+              href="/market"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-primary text-on-primary hover:bg-deep-canopy transition-all shrink-0 font-label text-label-lg shadow-sm"
+            >
+              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                eco
+              </span>
+              <span>Retire Zone A-4 Credits</span>
+            </Link>
+          </div>
+
+          {/* Beneficiary Distribution Strip */}
+          <div className="pt-4 border-t border-outline-variant/50 flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <span className="font-label text-label-md font-semibold text-on-surface">On-Chain Panchayat &amp; Co-op Revenue Split</span>
+              <span className="font-mono text-mono-sm text-botanical-muted">Automated Smart Contract Split (100%)</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-rhizome-earth" aria-hidden="true" />
-              <span className="font-body text-body-md text-on-surface">Community Buffer Reserve (20%)</span>
+            <div className="w-full h-3 rounded-full overflow-hidden flex gap-0.5 bg-surface-container">
+              <div className="h-full bg-primary w-[45%]" title="Mouli Honey Collector Co-op (45%)" />
+              <div className="h-full bg-tidal-teal w-[35%]" title="Gosaba Forest Protection Samiti (35%)" />
+              <div className="h-full bg-rhizome-earth w-[20%]" title="Community Buffer Reserve (20%)" />
+            </div>
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-1 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-primary" aria-hidden="true" />
+                <span className="font-body text-on-surface font-medium">Mouli Honey Collector Co-op (45%)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-tidal-teal" aria-hidden="true" />
+                <span className="font-body text-on-surface font-medium">Gosaba Forest Protection Samiti (35%)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-rhizome-earth" aria-hidden="true" />
+                <span className="font-body text-on-surface font-medium">Community Buffer Reserve (20%)</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* 2-Column Main Telemetry Grid: Left 60% (7 cols), Right 40% (5 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Satellite & Telemetry Console */}
-        <div className="lg:col-span-7 flex flex-col gap-gutter-lg">
+        <div className="lg:col-span-7 flex flex-col gap-6">
           {/* Before/After Multispectral Slider from Stitch */}
-          <article className="bg-surface-card rounded-xl border border-outline-variant/60 p-gutter-lg shadow-[0_4px_20px_rgba(27,56,43,0.04)] flex flex-col gap-gutter-md">
+          <article className="bg-surface-card rounded-2xl border border-outline-variant/60 p-6 shadow-[0_4px_20px_rgba(27,56,43,0.04)] flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <h2 className="font-headline text-headline-md text-on-surface">Multispectral Canopy Comparison</h2>
-                <p className="font-body text-body-md text-botanical-muted">Baseline Landsat-8 (2020) vs Sentinel-2 L2A (Q3 2026)</p>
+                <h2 className="font-headline text-xl sm:text-2xl font-bold text-on-surface">Multispectral Canopy Comparison</h2>
+                <p className="font-body text-xs sm:text-sm text-botanical-muted">Baseline Landsat-8 (2020) vs Sentinel-2 L2A (Q3 2026)</p>
               </div>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container text-on-primary-container">
                 <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
                   compare
                 </span>
-                <span className="font-label text-label-sm">+142% Canopy Density</span>
+                <span className="font-label text-label-sm font-semibold">+142% Canopy Density</span>
               </span>
             </div>
 
-            <div className="relative w-full h-72 rounded-lg overflow-hidden border border-outline-variant/70 select-none">
+            <div className="relative w-full h-80 rounded-xl overflow-hidden border border-outline-variant/70 select-none bg-deep-canopy">
               {/* After Image (2026 Sentinel-2) */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://lh3.googleusercontent.com/aida/ALJJyrAx4kj4TwgBEj3y2g5AIONNZQwtG2ja9X1sGFzziLuR1vaG-c0o5hAHN4fUb4uVU5LazX_9GKjtPC_QelvulF-akTlzKDJomDr8ASoszXG80Rcd-s7z2I_XjvCvTUzDQRMfep_AJf_xMjqHq_0b1bPqYVc0_osTFk5lngwDhRy1JiqN9hjHoNjG98r0ADwWN5a6UbXIMKRNX7FIMQ1r2FptkjPOPmEMlpPIxUsjnxPEud5Ez8qzZ0jBVTIQsbi1"
+                src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=1200&q=80"
                 alt="Sentinel-2 2026 restored dense mangrove canopy"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -131,9 +144,9 @@ export default function ProjectDetailPage({
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="https://lh3.googleusercontent.com/aida/ALJJyrAy3uPAxMcAej1ORlLqRCnQtqhzXLSoNqdJWVHd22PpV00hVdGfpHo3LIDsOZcV9en7eb6KjVCJj5XyCe43XfcX2SHLNj2PHiuRcK3m1_f0G25gTrF9y0BfJ35_rAqoRheQIJe-EwIZrhgiNWH3Oe1o7IG704VAjlenxDUgpL3nM4m5QtLxGBUBsTRWX-reII9rnKgWoeWUxwAowqCX0BC6eLGlfguLmOk5nldl4GdtlR2z1yf98OXPuavcVlQ"
+                  src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
                   alt="Landsat 2020 baseline degraded mudflat"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover grayscale contrast-125 brightness-90"
                 />
               </div>
               {/* Vertical Divider Line */}
@@ -149,10 +162,10 @@ export default function ProjectDetailPage({
                 </div>
               </div>
               {/* Overlay Labels */}
-              <span className="font-mono text-mono-sm absolute top-3 left-3 px-2.5 py-1 rounded-full bg-deep-canopy/85 backdrop-blur-md text-on-deep-canopy">
+              <span className="font-mono text-mono-sm absolute top-3 left-3 px-2.5 py-1 rounded-full bg-deep-canopy/85 backdrop-blur-md text-on-deep-canopy border border-on-deep-canopy/20">
                 Landsat Baseline • 2020
               </span>
-              <span className="font-mono text-mono-sm absolute top-3 right-3 px-2.5 py-1 rounded-full bg-primary/90 backdrop-blur-md text-on-primary">
+              <span className="font-mono text-mono-sm absolute top-3 right-3 px-2.5 py-1 rounded-full bg-primary/90 backdrop-blur-md text-on-primary border border-on-primary/20">
                 Sentinel-2 • Q3 2026
               </span>
 

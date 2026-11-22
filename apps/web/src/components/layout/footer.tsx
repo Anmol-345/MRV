@@ -13,7 +13,7 @@ export function Footer() {
 
   return (
     <footer className="bg-surface-card border-t border-outline-variant/60 py-gutter-lg mt-auto text-on-surface">
-      <div className="max-w-[1280px] mx-auto px-gutter-md sm:px-gutter-xl flex flex-col gap-6">
+      <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-gutter-md">
           {/* Mandatory Pilot Trust Badge from Stitch */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-container text-on-primary-container border border-primary/15">
