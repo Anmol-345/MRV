@@ -5,6 +5,8 @@
   "private": true,
   "scripts": {
     "deploy:program": "tsx scripts/deploy.ts",
+    "deploy:mainnet": "tsx scripts/deploy.ts --mainnet",
+    "check-balance": "tsx scripts/check-balance.ts",
     "smoke": "tsx scripts/smoke-test.ts",
     "build:wrapper": "rustc -O -o rustc-wrapper.exe rustc-wrapper.rs",
     "build:wasm": "cargo build --manifest-path app/Cargo.toml --release"

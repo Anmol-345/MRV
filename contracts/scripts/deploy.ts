@@ -54,7 +54,13 @@ export async function deploy(): Promise<DeploymentResult> {
   const { path: wasmPath, data: wasmBinary } = findWasmBinary();
   console.log(`Using WASM: ${wasmPath} (${(wasmBinary.length / 1024).toFixed(1)} KB)`);
 
-  const rpcUrl = process.env.VARA_RPC_URL || 'wss://testnet.vara.network';
+  const isMainnet =
+    process.argv.includes('--mainnet') ||
+    process.argv.includes('mainnet') ||
+    process.env.NETWORK === 'mainnet';
+  const defaultRpc = isMainnet ? 'wss://rpc.vara.network' : 'wss://testnet.vara.network';
+  const rpcUrl = process.env.VARA_RPC_URL || defaultRpc;
+  console.log(`Target Network: ${isMainnet ? 'Vara Mainnet' : 'Vara Testnet'}`);
   console.log(`Target RPC: ${rpcUrl}`);
 
   const keyring = new Keyring({ type: 'sr25519' });
