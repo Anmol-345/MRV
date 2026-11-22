@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "pnpm --filter @blutoken/web dev",
     "build": "pnpm -r run build",
+    "build:web": "pnpm --filter @blutoken/database build && pnpm --filter @blutoken/chain-client build && pnpm --filter @blutoken/web build",
     "start": "pnpm --filter @blutoken/web start",
     "start:web": "pnpm --filter @blutoken/web start",
     "start:indexer": "pnpm --filter @blutoken/indexer start",
