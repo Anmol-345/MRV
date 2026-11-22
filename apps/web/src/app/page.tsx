@@ -88,7 +88,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main id="top" className="flex-1 flex flex-col gap-16 md:gap-24 pb-16">
+    <main id="top" className="flex-1 flex flex-col gap-12 md:gap-16 pb-16">
       {/* Hero Section from Stitch */}
       <section className="relative bg-deep-canopy text-on-deep-canopy overflow-hidden">
         {/* Aerial View of Sundarbans Mangrove Canals */}
@@ -112,7 +112,7 @@ export default function HomePage() {
           <path d="M0 230C150 190 280 300 430 250C540 215 580 300 620 270" stroke="#1F6F78" strokeWidth="1.5" />
         </svg>
 
-        <div className="relative max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 pb-28 md:pb-36">
+        <div className="relative max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 pb-16 md:pb-20">
           <div className="max-w-3xl flex flex-col gap-6">
             <div className="inline-flex items-center gap-2 self-start px-3.5 py-1.5 rounded-full bg-surface-card/15 backdrop-blur-md border border-on-deep-canopy/20">
               <span className="material-symbols-outlined text-[16px] text-shoot-lime" aria-hidden="true">
@@ -154,7 +154,7 @@ export default function HomePage() {
       </section>
 
       {/* Live KPI Stat Strip (4 Floating Pebble Cards) */}
-      <section id="projects" className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 -mt-20 sm:-mt-24 relative z-10 w-full">
+      <section id="projects" className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 items-stretch">
           {/* KPI 1 */}
           <article className="bg-surface-card text-on-surface-card rounded-2xl border border-outline-variant/60 p-6 shadow-md flex flex-col justify-between gap-3 h-full hover:shadow-lg transition-all">
