@@ -91,3 +91,20 @@ This document records the exact tool, library, and framework versions pinned acr
   - **Citizen Report Privacy:** Coordinates on public `GET /api/citizen-reports` are jittered/rounded to 2 decimal places (~1.1 km) to protect sensitive coastal sites, while elevated users (Admin/Verifier) access exact coordinates.
   - **IoT Sensor Telemetry:** Sensor devices are registered with ed25519 public keys (`POST /api/devices`). Ingestion endpoint (`POST /api/ingest/sensor`) enforces a 15-minute clock drift freshness window, memory-cached nonce replay prevention, and ed25519 detached signature verification before writing to `sensor_readings`.
   - **MRV Worker Integration:** Satellite observation callbacks (`POST /api/internal/mrv/callback`) require matching shared secret header `X-MRV-Secret`.
+
+### ADR 011: Vara Mainnet Deployment & Production Parameters
+- **Context:** Official deployment of BluToken Sails program binary to Vara Mainnet (`wss://rpc.vara.network`).
+- **Decision & Mainnet Coordinates:**
+  - **Program ID:** `0x562a96cc072e97bc223e48d75e384654978682501b2b8eb29a94189a67026f6a`
+  - **Network:** Vara Mainnet (`wss://rpc.vara.network`)
+  - **Deployer (Admin & Initial Treasury):** `kGkS4G9FQXc8JYsYJSL21SszTVoKzmU5WqFoqDATWRbLN5Wp8` (`0xd8a6b2213c2ed601e84f8208d070e4603b398426bf4d0577b156fe9c989e8d13`)
+  - **Code Upload Tx Hash:** `0xdf04ba580a8d647c8dd466f124eb171785c11bada3c809f238b441ebb1cb7928`
+  - **Init Message ID:** `0x6d502898069ea2eb6214ecbbd944d772a3414c818d7b16773747488f0043f17c`
+  - **SetParams Tx Hash:** `0xeceb2ce9e796729408999f1d2afd8fbabd1ebe6c6dbb730ae3a19e7909397316`
+  - **On-chain Parameters:**
+    - Quorum: `2` verifier signatures
+    - Min Organizations: `2` independent organizations
+    - Buffer pool: `2000` bps (20% retained for permanence guarantee)
+    - Platform fee: `250` bps (2.5% protocol revenue)
+    - Paused: `false`
+  - **Gear Idea Explorer:** [View on Vara Idea Explorer](https://idea.gear-tech.io/programs/0x562a96cc072e97bc223e48d75e384654978682501b2b8eb29a94189a67026f6a?node=wss%3A%2F%2Frpc.vara.network)

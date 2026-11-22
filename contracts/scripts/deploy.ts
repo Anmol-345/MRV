@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import { GearApi } from '@gear-js/api';
 import { Keyring } from '@polkadot/keyring';
 import { u8aToHex } from '@polkadot/util';
-import { decodeAddress } from '@polkadot/util-crypto';
+import { decodeAddress, cryptoWaitReady } from '@polkadot/util-crypto';
 import { BluToken, type Params } from '@blutoken/chain-client';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -51,6 +51,8 @@ export async function deploy(): Promise<DeploymentResult> {
   console.log('BluToken Contract Deployment (Vara Network)');
   console.log('='.repeat(60));
 
+  await cryptoWaitReady();
+
   const { path: wasmPath, data: wasmBinary } = findWasmBinary();
   console.log(`Using WASM: ${wasmPath} (${(wasmBinary.length / 1024).toFixed(1)} KB)`);
 
@@ -59,11 +61,11 @@ export async function deploy(): Promise<DeploymentResult> {
     process.argv.includes('mainnet') ||
     process.env.NETWORK === 'mainnet';
   const defaultRpc = isMainnet ? 'wss://rpc.vara.network' : 'wss://testnet.vara.network';
-  const rpcUrl = process.env.VARA_RPC_URL || defaultRpc;
+  const rpcUrl = process.env.VARA_MAINNET_RPC || process.env.VARA_RPC_URL || defaultRpc;
   console.log(`Target Network: ${isMainnet ? 'Vara Mainnet' : 'Vara Testnet'}`);
   console.log(`Target RPC: ${rpcUrl}`);
 
-  const keyring = new Keyring({ type: 'sr25519' });
+  const keyring = new Keyring({ type: 'sr25519', ss58Format: 137 });
   const deployerSeed = process.env.DEPLOYER_SEED || process.env.DEPLOYER_MNEMONIC;
   const deployer = deployerSeed
     ? deployerSeed.startsWith('//')
@@ -75,7 +77,7 @@ export async function deploy(): Promise<DeploymentResult> {
   console.log(`Deployer address: ${deployer.address}`);
   console.log(`Deployer ActorId: ${deployerActorId}`);
   if (!deployerSeed) {
-    console.log('[Notice] Using default development keyring //Alice. For testnet, set DEPLOYER_SEED/MNEMONIC.');
+    console.log('[Notice] Using default development keyring //Alice. For testnet/mainnet, set DEPLOYER_SEED/MNEMONIC.');
   }
 
   const treasuryActorId = process.env.TREASURY_ADDRESS
@@ -96,16 +98,19 @@ export async function deploy(): Promise<DeploymentResult> {
 
   try {
     console.log(`Connecting to GearApi at ${rpcUrl}...`);
-    // Connect with a 10s timeout
+    // Connect with a 30s timeout
     const connectPromise = GearApi.create({ providerAddress: rpcUrl });
     const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Connection timed out after 10s')), 10000)
+      setTimeout(() => reject(new Error('Connection timed out after 30s')), 30000)
     );
     api = await Promise.race([connectPromise, timeoutPromise]);
     isConnected = true;
     console.log(`Connected to chain: ${await api.chain()} (genesis: ${api.genesisHash.toHex().slice(0, 10)}...)`);
   } catch (err: any) {
     console.warn(`[Warning] Could not connect to RPC endpoint: ${err.message}`);
+    if (isMainnet) {
+      throw new Error(`Failed to connect to Vara Mainnet RPC at ${rpcUrl}. Aborting.`);
+    }
   }
 
   let programId: `0x${string}`;
@@ -124,32 +129,39 @@ export async function deploy(): Promise<DeploymentResult> {
       await isFinalized;
 
       programId = blutoken.programId;
-      console.log(`>>> Program created on-chain at: ${programId} <<<`);
+      console.log(`\n============================================================`);
+      console.log(`>>> PROGRAM DEPLOYED ON-CHAIN AT: ${programId} <<<`);
+      console.log(`============================================================\n`);
 
       // Initialize parameters
       console.log('Setting initial platform parameters...');
       const paramsTx = blutoken.admin.setParams(initialParams);
       await paramsTx.withAccount(deployer).calculateGas();
       const paramsResult = await paramsTx.signAndSend();
+      console.log(`setParams transaction sent! txHash=${paramsResult.txHash}`);
       await paramsResult.isFinalized;
       const paramsResponse = await paramsResult.response();
       console.log('Parameters configured successfully:', paramsResponse);
 
-      // Grant initial verifier roles to Bob and Charlie (testnet dev orgs)
-      const bob = keyring.addFromUri('//Bob');
-      const charlie = keyring.addFromUri('//Charlie');
-      console.log('Granting pilot verifier roles (Org 1: Bob, Org 2: Charlie)...');
+      if (!isMainnet) {
+        // Grant initial verifier roles to Bob and Charlie (testnet dev orgs)
+        const bob = keyring.addFromUri('//Bob');
+        const charlie = keyring.addFromUri('//Charlie');
+        console.log('Granting pilot verifier roles (Org 1: Bob, Org 2: Charlie)...');
 
-      const bobRoleTx = blutoken.admin.grantRole(u8aToHex(bob.addressRaw) as `0x${string}`, 'Verifier', 1);
-      await bobRoleTx.withAccount(deployer).calculateGas();
-      const bobRes = await bobRoleTx.signAndSend();
-      await bobRes.isFinalized;
+        const bobRoleTx = blutoken.admin.grantRole(u8aToHex(bob.addressRaw) as `0x${string}`, 'Verifier', 1);
+        await bobRoleTx.withAccount(deployer).calculateGas();
+        const bobRes = await bobRoleTx.signAndSend();
+        await bobRes.isFinalized;
 
-      const charlieRoleTx = blutoken.admin.grantRole(u8aToHex(charlie.addressRaw) as `0x${string}`, 'Verifier', 2);
-      await charlieRoleTx.withAccount(deployer).calculateGas();
-      const charlieRes = await charlieRoleTx.signAndSend();
-      await charlieRes.isFinalized;
-      console.log('Pilot verifier roles granted.');
+        const charlieRoleTx = blutoken.admin.grantRole(u8aToHex(charlie.addressRaw) as `0x${string}`, 'Verifier', 2);
+        await charlieRoleTx.withAccount(deployer).calculateGas();
+        const charlieRes = await charlieRoleTx.signAndSend();
+        await charlieRes.isFinalized;
+        console.log('Pilot verifier roles granted.');
+      } else {
+        console.log('[Mainnet] Deployer holds Admin role. Production verifiers can be granted on-chain as needed.');
+      }
     } finally {
       await api.disconnect();
     }
@@ -165,7 +177,7 @@ export async function deploy(): Promise<DeploymentResult> {
 
   const result: DeploymentResult = {
     programId,
-    network: isConnected ? 'testnet' : 'mock-local',
+    network: isConnected ? (isMainnet ? 'mainnet' : 'testnet') : 'mock-local',
     rpcUrl,
     deployerAddress: deployer.address,
     deployerActorId,
@@ -182,6 +194,7 @@ export async function deploy(): Promise<DeploymentResult> {
   console.log('\nTo configure apps/web with this program:');
   console.log(`Add to .env.local: NEXT_PUBLIC_PROGRAM_ID=${programId}`);
   console.log(`Add to .env.local: NEXT_PUBLIC_VARA_RPC_URL=${rpcUrl}`);
+  console.log(`Explorer Link: https://idea.gear-tech.io/programs/${programId}?node=${encodeURIComponent(rpcUrl)}`);
   console.log('='.repeat(60));
 
   return result;
