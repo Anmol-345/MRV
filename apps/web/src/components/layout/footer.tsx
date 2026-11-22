@@ -1,82 +1,60 @@
 import React from 'react';
 import Link from 'next/link';
-import { Waves, ExternalLink, ShieldAlert } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { truncateAddress } from '@/lib/formatters';
 
 export function Footer() {
-  const programId = process.env.NEXT_PUBLIC_PROGRAM_ID || '0xd43593c715fdd31c6d514527da2d9d6b3e8f57b5d155fb3e5fb286dce6755a1c';
-  const explorerUrl = process.env.NEXT_PUBLIC_EXPLORER_URL || 'https://idea.gear-tech.io/programs';
+  const programId =
+    process.env.NEXT_PUBLIC_PROGRAM_ID ||
+    '0x562a96cc072e97bc223e48d75e384654978682501b2b8eb29a94189a67026f6a';
+  const explorerUrl =
+    process.env.NEXT_PUBLIC_EXPLORER_URL ||
+    'https://idea.gear-tech.io/programs';
 
   return (
-    <footer className="bg-deep-green text-mist/90 border-t border-forest pt-12 pb-8 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand & Mission */}
-          <div className="md:col-span-2 space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-forest flex items-center justify-center text-lime">
-                <Waves className="w-4 h-4" />
-              </div>
-              <span className="font-serif font-bold text-xl text-white tracking-tight">BluToken</span>
-            </div>
-            <p className="text-xs text-mist/70 leading-relaxed max-w-sm">
-              Blockchain-based Blue Carbon Registry &amp; MRV platform for India&apos;s coastal ecosystems (mangroves, seagrass, salt marsh). Powered by Vara Network and the Sails smart contract framework.
-            </p>
+    <footer className="bg-surface-card border-t border-outline-variant/60 py-gutter-lg mt-auto text-on-surface">
+      <div className="max-w-[1280px] mx-auto px-gutter-md sm:px-gutter-xl flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-gutter-md">
+          {/* Mandatory Pilot Trust Badge from Stitch */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-container text-on-primary-container border border-primary/15">
+            <span className="font-label text-label-md">
+              🌿 Pilot Blue Carbon Registry — Powered by Vara Network &amp; Sentinel-2 Satellite MRV
+            </span>
           </div>
 
-          {/* Platform Links */}
-          <div className="space-y-2">
-            <div className="text-xs font-semibold text-lime uppercase tracking-wider">Registry &amp; Trade</div>
-            <ul className="space-y-1.5 text-xs text-mist/80">
-              <li>
-                <Link href="/projects" className="hover:text-white transition-colors">
-                  Explore Projects
-                </Link>
-              </li>
-              <li>
-                <Link href="/market" className="hover:text-white transition-colors">
-                  Carbon Marketplace
-                </Link>
-              </li>
-              <li>
-                <Link href="/audit" className="hover:text-white transition-colors">
-                  On-chain Audit Trail
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Smart Contract Info */}
-          <div className="space-y-2">
-            <div className="text-xs font-semibold text-lime uppercase tracking-wider">Vara Program</div>
-            <p className="text-xs text-mist/70">Deployed Smart Contract:</p>
+          <div className="flex flex-wrap items-center gap-gutter-lg text-botanical-muted text-body-md font-body">
             <a
-              href={`${explorerUrl}/${programId}`}
+              href={`${explorerUrl}/${programId}?node=wss%3A%2F%2Frpc.vara.network`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 font-mono text-[11px] text-lime hover:underline bg-forest/60 px-2.5 py-1.5 rounded-md border border-leaf/30"
+              className="inline-flex items-center gap-1.5 font-mono text-mono-sm text-primary hover:underline bg-surface-container-low px-3 py-1 rounded-full border border-outline-variant/50"
             >
-              <span>{truncateAddress(programId, 8)}</span>
+              <span>Vara Mainnet: {truncateAddress(programId, 6)}</span>
               <ExternalLink className="w-3 h-3 shrink-0" />
             </a>
+            <span className="font-mono text-mono-sm">NCCR • WII • NCSCM Multi-Org Quorum</span>
           </div>
         </div>
 
-        {/* Legal Disclaimer Box */}
-        <div className="bg-forest/50 border border-leaf/30 rounded-xl p-4 flex items-start gap-3 text-xs text-mist/80">
-          <ShieldAlert className="w-5 h-5 text-lime shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <span className="font-semibold text-white">Pilot Registry Notice:</span> BluTokens are pilot registry tokens, not government-certified credits. BluToken demonstrates transparent MRV methodologies, immutable cryptographic provenance, and decentralized revenue sharing for coastal communities under pilot standards.
-          </div>
-        </div>
-
-        {/* Copyright */}
-        <div className="border-t border-forest/60 pt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-mist/60 gap-2">
-          <div>&copy; {new Date().getFullYear()} BluToken Platform. Open source under Apache-2.0.</div>
-          <div className="flex gap-4">
-            <span>India Coastal Blue Carbon Initiative</span>
-            <span>·</span>
-            <span>Vara Testnet</span>
+        {/* Links row */}
+        <div className="pt-4 border-t border-outline-variant/40 flex flex-col sm:flex-row items-center justify-between text-body-md text-botanical-muted gap-3">
+          <div>&copy; {new Date().getFullYear()} BluToken — India Coastal Blue Carbon Initiative.</div>
+          <div className="flex items-center gap-4 text-label-sm font-label">
+            <Link href="/projects" className="hover:text-primary transition-colors">
+              Projects
+            </Link>
+            <span>•</span>
+            <Link href="/market" className="hover:text-primary transition-colors">
+              Marketplace
+            </Link>
+            <span>•</span>
+            <Link href="/report-threat" className="hover:text-primary transition-colors">
+              Citizen PWA
+            </Link>
+            <span>•</span>
+            <Link href="/audit" className="hover:text-primary transition-colors">
+              Audit Trail
+            </Link>
           </div>
         </div>
       </div>

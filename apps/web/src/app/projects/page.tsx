@@ -42,22 +42,22 @@ export default function ProjectsPage() {
   });
 
   return (
-    <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
+    <main className="flex-1 max-w-[1280px] mx-auto px-gutter-md sm:px-gutter-xl py-gutter-xl w-full flex flex-col gap-gutter-lg">
       {/* Page Header */}
-      <div className="space-y-2">
-        <div className="text-xs font-semibold uppercase tracking-wider text-forest">
+      <div className="flex flex-col gap-1">
+        <span className="font-label text-label-sm text-tidal-teal uppercase tracking-wider">
           On-chain Registry
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ink">
+        </span>
+        <h1 className="font-headline text-headline-lg-mobile md:text-headline-lg text-on-surface">
           Coastal Blue Carbon Projects
         </h1>
-        <p className="text-sm text-muted max-w-2xl">
+        <p className="font-body text-body-md text-botanical-muted max-w-2xl">
           Browse verified blue carbon conservation and restoration projects registered on the Vara blockchain registry across India&apos;s coastline.
         </p>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-muted/20 shadow-sm space-y-4">
+      <div className="bg-surface-card p-gutter-md rounded-xl border border-outline-variant/60 shadow-[0_4px_20px_rgba(27,56,43,0.04)] flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* Search Input */}
           <div className="relative sm:col-span-1">

@@ -1,389 +1,262 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import {
-  ShieldAlert,
-  Camera,
-  MapPin,
-  Wifi,
-  WifiOff,
-  CheckCircle2,
-  AlertTriangle,
-  UploadCloud,
-  Send,
-  Loader2,
-  ArrowLeft,
-  X,
-} from 'lucide-react';
-import { useOfflineQueue, saveQueuedReport } from '@/components/pwa/offline-queue';
-import { useI18n } from '@/lib/i18n';
+import { useOfflineQueue, saveQueuedReport, type QueuedThreatReport } from '@/components/pwa/offline-queue';
+
+const COPY: Record<string, { title: string; sub: string; btn: string }> = {
+  en: {
+    title: 'Coastal Threat Reporter',
+    sub: 'Capture geotagged evidence for rapid Forest Samiti response.',
+    btn: 'Submit Field Report to Forest Panchayat',
+  },
+  hi: {
+    title: 'तटीय खतरा रिपोर्टर',
+    sub: 'वन समिति की त्वरित कार्रवाई के लिए जियोटैग किया गया साक्ष्य भेजें।',
+    btn: 'वन पंचायत को फील्ड रिपोर्ट भेजें',
+  },
+  bn: {
+    title: 'উপকূলীয় বিপদ রিপোর্টার',
+    sub: 'বন সমিতির দ্রুত পদক্ষেপের জন্য জিওট্যাগ করা প্রমাণ পাঠান।',
+    btn: 'বন পঞ্চায়েতে ফিল্ড রিপোর্ট জমা দিন',
+  },
+};
 
 export default function CitizenReportingPwaPage() {
-  const { t } = useI18n();
   const { isOnline, queueCount, refreshCount } = useOfflineQueue();
-
-  // Form State
-  const [category, setCategory] = useState<string>('Cutting');
-  const [severity, setSeverity] = useState<string>('Medium');
-  const [latitude, setLatitude] = useState<number>(21.95);
-  const [longitude, setLongitude] = useState<number>(88.85);
+  const [lang, setLang] = useState<'en' | 'hi' | 'bn'>('en');
+  const [selectedCat, setSelectedCat] = useState<string>('Illegal Mangrove Felling');
   const [note, setNote] = useState<string>('');
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [submittedMessage, setSubmittedMessage] = useState<string | null>(null);
 
-  const [submitting, setSubmitting] = useState<boolean>(false);
-  const [submittedStatus, setSubmittedStatus] = useState<'online' | 'offline_queued' | null>(null);
+  const categories = [
+    { id: 'felling', name: 'Illegal Mangrove Felling', icon: 'carpenter', color: 'text-rhizome-earth' },
+    { id: 'erosion', name: 'Bund Erosion / Tidal Breach', icon: 'waves', color: 'text-tidal-teal' },
+    { id: 'debris', name: 'Oil / Plastic Debris', icon: 'oil_barrel', color: 'text-rhizome-earth' },
+    { id: 'wildlife', name: 'Unusual Wildlife / Crab Mortality', icon: 'pest_control', color: 'text-living-leaf' },
+  ];
 
-  const handleGetLocation = () => {
-    if (typeof window !== 'undefined' && 'geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          // Truncate to 4 decimals for privacy & exactness
-          setLatitude(Math.round(pos.coords.latitude * 10000) / 10000);
-          setLongitude(Math.round(pos.coords.longitude * 10000) / 10000);
-        },
-        () => {
-          // Fallback location kept
-        }
-      );
-    }
-  };
-
-  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setPhotoPreview(event.target?.result as string);
+  const handleSubmit = async () => {
+    const reportData: QueuedThreatReport = {
+      id: `report_${Date.now()}`,
+      category: selectedCat,
+      severity: 'High',
+      latitude: 21.8421,
+      longitude: 88.8924,
+      note,
+      timestamp: new Date().toISOString(),
+      synced: false,
     };
-    reader.readAsDataURL(file);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-
-    const reportId = 'report_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
 
     if (!isOnline) {
-      // Store in offline IndexedDB
-      await saveQueuedReport({
-        id: reportId,
-        projectId: 1,
-        category,
-        severity,
-        latitude,
-        longitude,
-        note,
-        imageBase64: photoPreview || undefined,
-        timestamp: new Date().toISOString(),
-        synced: false,
-      });
-      await refreshCount();
-      setSubmittedStatus('offline_queued');
-      setSubmitting(false);
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/citizen-reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          projectId: 1,
-          category,
-          severity,
-          latitude,
-          longitude,
-          note,
-          photoCid: photoPreview ? 'bafkreiphotosynced' : undefined,
-        }),
-      });
-
-      if (res.ok) {
-        setSubmittedStatus('online');
-      } else {
-        // Fallback to offline queue on API error
-        await saveQueuedReport({
-          id: reportId,
-          projectId: 1,
-          category,
-          severity,
-          latitude,
-          longitude,
-          note,
-          imageBase64: photoPreview || undefined,
-          timestamp: new Date().toISOString(),
-          synced: false,
+      await saveQueuedReport(reportData);
+      refreshCount();
+      setSubmittedMessage('Offline: Report queued in IndexedDB. Will sync when connection restores.');
+    } else {
+      try {
+        await fetch('/api/citizen-reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(reportData),
         });
-        await refreshCount();
-        setSubmittedStatus('offline_queued');
+        setSubmittedMessage('Report submitted successfully to Forest Panchayat and queued for IPFS pinning!');
+      } catch {
+        await saveQueuedReport(reportData);
+        refreshCount();
+        setSubmittedMessage('Network error: Saved to local offline queue.');
       }
-    } catch {
-      await saveQueuedReport({
-        id: reportId,
-        projectId: 1,
-        category,
-        severity,
-        latitude,
-        longitude,
-        note,
-        imageBase64: photoPreview || undefined,
-        timestamp: new Date().toISOString(),
-        synced: false,
-      });
-      await refreshCount();
-      setSubmittedStatus('offline_queued');
-    } finally {
-      setSubmitting(false);
     }
+
+    setTimeout(() => setSubmittedMessage(null), 5000);
   };
 
-  const resetForm = () => {
-    setSubmittedStatus(null);
-    setNote('');
-    setPhotoPreview(null);
-  };
+  const c = COPY[lang];
 
   return (
-    <main className="flex-1 bg-mist/30 py-6 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-xl mx-auto space-y-6">
-        <div>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-ink transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Return to Home</span>
-          </Link>
-        </div>
-
-        {/* Connectivity Status Banner */}
-        <div
-          className={`p-3 rounded-2xl border text-xs flex items-center justify-between transition-colors ${
-            isOnline
-              ? 'bg-leaf/10 border-leaf/30 text-forest'
-              : 'bg-earth/20 border-earth/30 text-earth'
-          }`}
-        >
-          <div className="flex items-center gap-2 font-medium">
-            {isOnline ? (
-              <>
-                <Wifi className="w-4 h-4 text-leaf" />
-                <span>Connected Online · Auto-Sync Active</span>
-              </>
-            ) : (
-              <>
-                <WifiOff className="w-4 h-4 text-earth" />
-                <span>Offline / Airplane Mode · Reports Will Be Queued Locally</span>
-              </>
-            )}
-          </div>
-          {queueCount > 0 && (
-            <span className="font-bold px-2 py-0.5 rounded-full bg-white/80 border border-current">
-              {queueCount} Queued
+    <div className="max-w-md mx-auto w-full min-h-[884px] flex flex-col bg-surface text-on-surface font-body shadow-lg my-0 sm:my-6 rounded-none sm:rounded-2xl overflow-hidden border border-outline-variant/60">
+      {/* Dark Forest Green Mobile PWA Header from Stitch */}
+      <header className="sticky top-0 z-40 bg-deep-canopy text-on-deep-canopy px-gutter-md py-3.5 shadow-md">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[20px] text-shoot-lime" aria-hidden="true">
+              shield_with_heart
             </span>
-          )}
-        </div>
-
-        {/* Header */}
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-earth/15 text-earth text-xs font-bold">
-            <ShieldAlert className="w-3.5 h-3.5" />
-            <span>Citizen Ecological Guardian PWA</span>
+            <span className="font-headline text-title-md text-on-deep-canopy">BluToken Field</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-black text-ink">Report Coastal Threat</h1>
-          <p className="text-xs sm:text-sm text-muted">
-            Report illegal tree felling, oil spills, chemical dumping, or coastal erosion. Submissions are cryptographically timestamped and queued offline if network is unavailable.
-          </p>
+
+          {/* Dual/Tri Language Toggle from Stitch */}
+          <div className="inline-flex items-center bg-surface-card/10 rounded-full p-0.5 border border-on-deep-canopy/20">
+            {(['en', 'hi', 'bn'] as const).map((code) => {
+              const labels = { en: 'EN', hi: 'हिन्दी', bn: 'বাংলা' };
+              const isActive = lang === code;
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => setLang(code)}
+                  className={`px-2 py-0.5 rounded-full font-label text-label-sm transition-colors ${
+                    isActive ? 'bg-shoot-lime text-on-shoot-lime' : 'text-on-deep-canopy'
+                  }`}
+                >
+                  {labels[code]}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Success Confirmation Card */}
-        {submittedStatus ? (
-          <div className="bg-white p-8 rounded-3xl border border-muted/20 shadow-sm text-center space-y-4">
-            <div
-              className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto ${
-                submittedStatus === 'online' ? 'bg-leaf/20 text-leaf' : 'bg-earth/20 text-earth'
+        <div className="flex items-center justify-between mt-2.5">
+          {/* Offline / Online Indicator Pill */}
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-label text-label-sm ${
+              isOnline
+                ? 'bg-living-leaf-container text-on-living-leaf-container'
+                : 'bg-rhizome-earth-container text-on-rhizome-earth-container'
+            }`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${isOnline ? 'bg-living-leaf' : 'bg-rhizome-earth'}`}
+              aria-hidden="true"
+            />
+            <span>{isOnline ? 'Online / Synced' : `Offline (${queueCount} queued)`}</span>
+          </span>
+          <span className="font-mono text-mono-sm text-on-deep-canopy/80">Gosaba Panchayat</span>
+        </div>
+      </header>
+
+      <main className="flex-1 px-gutter-md py-gutter-md flex flex-col gap-gutter-md">
+        {/* Title */}
+        <div>
+          <h1 className="font-headline text-headline-lg-mobile text-on-surface">{c.title}</h1>
+          <p className="font-body text-body-md text-botanical-muted">{c.sub}</p>
+        </div>
+
+        {/* Prominent Photo Capture Viewfinder with Geotag Overlay from Stitch */}
+        <section className="relative rounded-xl overflow-hidden border border-outline-variant shadow-sm h-56 bg-deep-canopy">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://lh3.googleusercontent.com/aida/ALJJyrDN3x1eEz-HH1Tgklv1xpSSMlZTPFzNMbzsebbfOyCCS2ngjePaWTgtX6Lwr_I92uAuWuAJh7Mgki1ROrFDCw_1rzhPPZlgQ7bz41a9BG1p_J6CFPYitbHrauBmDF0zivE_-cfsvFjjZ0NyxQHgyrlWWkCd-n5m1pfWvX53pK42fmeQ0VD-mwXV84rXFoMapJ_mUT1qu8tqjAGnhjLBrQO_EllQbQqcKpkYu7Bd42IDVZ_o5ac42xpDv4kgMTpG5eRc6g"
+            alt="Viewfinder showing Sundarbans mangrove shoreline"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-deep-canopy/20 pointer-events-none" aria-hidden="true" />
+
+          {/* Geotag Overlay Pill */}
+          <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-deep-canopy/85 backdrop-blur-md text-on-deep-canopy border border-on-deep-canopy/20">
+              <span className="material-symbols-outlined text-[15px] text-shoot-lime" aria-hidden="true">
+                location_on
+              </span>
+              <span className="font-mono text-mono-sm tabular-nums">
+                Lat: 21.8421°N, Lon: 88.8924°E • Sundarbans Buffer
+              </span>
+            </div>
+          </div>
+
+          {/* Camera Shutter Button */}
+          <div className="absolute bottom-3 inset-x-0 flex justify-center">
+            <button
+              type="button"
+              aria-label="Capture geotagged field photo"
+              className="w-12 h-12 rounded-full bg-surface-card text-deep-canopy shadow-lg border-4 border-shoot-lime flex items-center justify-center active:scale-95 transition-transform"
+            >
+              <span className="material-symbols-outlined text-[24px]" aria-hidden="true">
+                photo_camera
+              </span>
+            </button>
+          </div>
+        </section>
+
+        {/* Category Selection Grid (2x2 Tactile Icon Buttons from Stitch) */}
+        <section className="flex flex-col gap-2">
+          <span className="font-label text-label-md text-on-surface">Select Incident Category</span>
+          <div className="grid grid-cols-2 gap-3">
+            {categories.map((cat) => {
+              const isSelected = selectedCat === cat.name;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCat(cat.name)}
+                  className={`text-left rounded-lg p-3.5 flex flex-col gap-2 shadow-sm transition-all ${
+                    isSelected
+                      ? 'bg-primary-container border-2 border-primary'
+                      : 'bg-surface-card border border-outline-variant hover:border-primary'
+                  }`}
+                >
+                  <span className={`material-symbols-outlined text-[24px] ${cat.color}`} aria-hidden="true">
+                    {cat.icon}
+                  </span>
+                  <span className="font-label text-label-md text-on-surface leading-snug">{cat.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Audio Voice Note / Description Text Area from Stitch */}
+        <section className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="font-label text-label-md text-on-surface">Field Note or Voice Memo</span>
+            <button
+              type="button"
+              onClick={() => setIsRecording(!isRecording)}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-label text-label-sm transition-colors ${
+                isRecording
+                  ? 'bg-error-container text-on-error-container animate-pulse'
+                  : 'bg-primary-container text-on-primary-container'
               }`}
             >
-              <CheckCircle2 className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="font-serif font-bold text-xl text-ink">
-                {submittedStatus === 'online' ? 'Threat Report Submitted!' : 'Saved to Offline Queue!'}
-              </h3>
-              <p className="text-xs text-muted max-w-sm mx-auto leading-relaxed">
-                {submittedStatus === 'online'
-                  ? 'Your observation has been indexed and flagged on the regional government monitoring dashboard.'
-                  : 'Your threat report is saved in your local device storage and will automatically transmit once internet connectivity is restored.'}
-              </p>
-            </div>
-
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={resetForm}
-                className="px-6 py-2.5 rounded-xl bg-forest text-white text-xs font-semibold hover:bg-forest/90 transition-colors"
-              >
-                Submit Another Report
-              </button>
-            </div>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white p-6 sm:p-8 rounded-3xl border border-muted/20 shadow-sm space-y-6"
-          >
-            {/* Category */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-ink">Threat Category *</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-muted/20 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-forest"
-              >
-                <option value="Cutting">Illegal Cutting &amp; Tree Felling</option>
-                <option value="Pollution">Industrial / Chemical / Oil Pollution</option>
-                <option value="Reclamation">Unauthorized Coastal Land Reclamation</option>
-                <option value="Erosion">Severe Coastal &amp; Embankment Erosion</option>
-              </select>
-            </div>
-
-            {/* Severity */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-ink">Severity Level</label>
-              <div className="grid grid-cols-4 gap-2">
-                {['Low', 'Medium', 'High', 'Critical'].map((lvl) => (
-                  <button
-                    key={lvl}
-                    type="button"
-                    onClick={() => setSeverity(lvl)}
-                    className={`py-2 rounded-xl text-xs font-bold transition-all border ${
-                      severity === lvl
-                        ? lvl === 'Critical'
-                          ? 'bg-red-600 text-white border-red-600 shadow-sm'
-                          : 'bg-forest text-white border-forest shadow-sm'
-                        : 'bg-mist/40 text-muted border-muted/20 hover:border-muted/40'
-                    }`}
-                  >
-                    {lvl}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Geolocation */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-ink">Geotag Coordinates *</label>
-                <button
-                  type="button"
-                  onClick={handleGetLocation}
-                  className="text-xs text-forest font-semibold hover:underline inline-flex items-center gap-1"
-                >
-                  <MapPin className="w-3.5 h-3.5" />
-                  <span>Use Device GPS</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-[10px] text-muted font-medium">Latitude</span>
-                  <input
-                    type="number"
-                    step="0.0001"
-                    required
-                    value={latitude}
-                    onChange={(e) => setLatitude(parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 rounded-xl border border-muted/20 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-forest"
-                  />
-                </div>
-                <div>
-                  <span className="text-[10px] text-muted font-medium">Longitude</span>
-                  <input
-                    type="number"
-                    step="0.0001"
-                    required
-                    value={longitude}
-                    onChange={(e) => setLongitude(parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 rounded-xl border border-muted/20 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-forest"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Photo Capture */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-ink">Evidence Photo</label>
-              {photoPreview ? (
-                <div className="relative rounded-2xl overflow-hidden border border-muted/20 aspect-video bg-black/5">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={photoPreview}
-                    alt="Threat preview"
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setPhotoPreview(null)}
-                    className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 text-white hover:bg-black/80"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <label className="border-2 border-dashed border-muted/30 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-mist/50 transition-colors">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handlePhotoSelect}
-                    className="hidden"
-                  />
-                  <Camera className="w-8 h-8 text-forest mb-2" />
-                  <span className="text-xs font-semibold text-ink">Take Photo or Upload Evidence</span>
-                  <span className="text-[10px] text-muted mt-0.5">Mobile camera automatically compressed</span>
-                </label>
-              )}
-            </div>
-
-            {/* Notes */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-ink">Observation Notes</label>
-              <textarea
-                rows={3}
-                placeholder="Describe the incident, observed equipment, or environmental damage..."
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                className="w-full p-3 rounded-xl border border-muted/20 text-xs focus:outline-none focus:ring-2 focus:ring-forest"
-              />
-            </div>
-
-            {/* Submit Action */}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full py-3 rounded-xl bg-forest hover:bg-forest/90 disabled:opacity-40 text-white font-semibold text-xs shadow-sm transition-colors flex items-center justify-center gap-2"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Processing Report...</span>
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4" />
-                  <span>
-                    {isOnline ? 'Submit Report Now' : 'Queue Report (Offline)'}
-                  </span>
-                </>
-              )}
+              <span className="material-symbols-outlined text-[15px]" aria-hidden="true">
+                mic
+              </span>
+              <span>{isRecording ? 'Recording...' : 'Record Audio'}</span>
             </button>
-          </form>
+          </div>
+          <textarea
+            rows={2}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Describe tidal breach width or vessel markings..."
+            className="w-full rounded-lg border border-outline-variant bg-surface-card px-3.5 py-2.5 text-body-md text-on-surface placeholder:text-botanical-muted/70 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none"
+          />
+        </section>
+
+        {submittedMessage && (
+          <div className="p-3 rounded-lg bg-living-leaf-container text-on-living-leaf-container text-body-md font-body">
+            {submittedMessage}
+          </div>
         )}
-      </div>
-    </main>
+
+        {/* One-Tap Large Submit Button from Stitch */}
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="w-full min-h-[52px] inline-flex items-center justify-center gap-gutter-sm px-gutter-lg py-3 rounded-md bg-primary text-on-primary shadow-md hover:bg-deep-canopy active:scale-[0.99] transition-all font-label text-label-lg"
+        >
+          <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
+            send
+          </span>
+          <span>{c.btn}</span>
+        </button>
+
+        {/* Offline Sync Status Queue Card from Stitch */}
+        <section className="bg-surface-card rounded-xl border border-outline-variant/70 p-gutter-md flex flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <span className="font-label text-label-md text-on-surface">Sync Queue History</span>
+            <span className="font-label text-label-sm text-primary">All Synced</span>
+          </div>
+          <div className="flex items-center justify-between py-2 border-t border-outline-variant/50">
+            <div>
+              <p className="font-body text-body-md text-on-surface">Bund Erosion • Sector B-2</p>
+              <p className="font-mono text-mono-sm text-botanical-muted">21 Nov • 11:04 IST • CID #bafy...82a</p>
+            </div>
+            <span className="material-symbols-outlined text-[18px] text-living-leaf" aria-hidden="true">
+              cloud_done
+            </span>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

@@ -1,63 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, use } from 'react';
+import React, { useState, use } from 'react';
 import Link from 'next/link';
-import {
-  ArrowLeft,
-  MapPin,
-  Trees,
-  CheckCircle2,
-  Clock,
-  Layers,
-  FileText,
-  Users,
-  Activity,
-  Tag,
-  ExternalLink,
-  ShieldCheck,
-  AlertCircle,
-} from 'lucide-react';
-import { EcosystemBadge } from '@/components/ui/ecosystem-badge';
-import { StatCard } from '@/components/ui/stat-card';
-import { ListingCard } from '@/components/market/listing-card';
-import { formatBlu, formatNumber, truncateAddress, formatDate } from '@/lib/formatters';
-import { useI18n } from '@/lib/i18n';
-
-interface ProjectDetailData {
-  id: string | bigint;
-  name: string;
-  ecosystem: string;
-  stateCode: string;
-  areaHa: number | string;
-  status: string;
-  totalMinted: string | bigint;
-  totalRetired: string | bigint;
-  bufferHeld: string | bigint;
-  ownerWallet: string;
-  boundaryCid: string;
-  createdAt: string;
-  description?: string | null;
-  beneficiaries: Array<{
-    id: number;
-    wallet: string;
-    shareBps: number;
-    displayName?: string | null;
-  }>;
-  reports: Array<{
-    id: string | bigint;
-    status: string;
-    periodStart: string | bigint;
-    periodEnd: string | bigint;
-    estimatedMilli: string | bigint;
-    minted: string | bigint;
-    buffered: string | bigint;
-    methodologyVersion: string;
-    dataCid: string;
-    dataHash: string;
-    votes: Array<{ verifierWallet: string; approve: boolean }>;
-  }>;
-  listings: Array<any>;
-}
 
 export default function ProjectDetailPage({
   params,
@@ -65,379 +9,384 @@ export default function ProjectDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const { t } = useI18n();
+  const [sliderPos, setSliderPos] = useState<number>(52);
+  const [copied, setCopied] = useState(false);
 
-  const [project, setProject] = useState<ProjectDetailData | null>(null);
-  const [observations, setObservations] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'reports' | 'observations' | 'listings'>('overview');
-
-  useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      fetch(`/api/projects/${id}`).then((r) => (r.ok ? r.json() : null)),
-      fetch(`/api/projects/${id}/observations`).then((r) => (r.ok ? r.json() : [])),
-    ])
-      .then(([projData, obsData]) => {
-        if (projData && !projData.error) {
-          setProject(projData);
-        }
-        if (Array.isArray(obsData)) {
-          setObservations(obsData);
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [id]);
-
-  if (loading) {
-    return (
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full text-center space-y-3">
-        <div className="w-8 h-8 rounded-full border-2 border-forest border-t-transparent animate-spin mx-auto" />
-        <div className="text-xs text-muted font-medium">{t.common.loading}</div>
-      </main>
-    );
-  }
-
-  if (!project) {
-    return (
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full text-center space-y-4">
-        <AlertCircle className="w-12 h-12 text-earth mx-auto" />
-        <h1 className="text-2xl font-serif font-bold text-ink">Project Not Found</h1>
-        <p className="text-xs text-muted">The requested project ID #{id} was not found on the registry.</p>
-        <Link href="/projects" className="inline-flex items-center gap-1.5 text-xs font-semibold text-forest hover:underline">
-          <ArrowLeft className="w-4 h-4" /> {t.common.back}
-        </Link>
-      </main>
-    );
-  }
+  const copyCid = () => {
+    navigator.clipboard?.writeText('bafybeigdyrzt5sfp7udm7hu9k3v6x2p8n4q1r7s5m9y0z');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
-      {/* Back button */}
-      <div>
-        <Link
-          href="/projects"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-forest hover:text-forest/80 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" /> {t.common.back}
+    <main id="telemetry" className="flex-1 max-w-[1280px] w-full mx-auto px-gutter-md sm:px-gutter-xl py-gutter-xl flex flex-col gap-gutter-lg">
+      {/* Breadcrumb from Stitch */}
+      <div className="flex items-center gap-2 text-botanical-muted">
+        <Link href="/projects" className="hover:text-primary transition-colors font-label text-label-md">
+          National Registry
         </Link>
+        <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
+          chevron_right
+        </span>
+        <span className="font-mono text-mono-md text-on-surface">
+          /projects/{id === '1' ? 'sundarbans' : id}
+        </span>
       </div>
 
-      {/* Project Hero Header */}
-      <div className="bg-white p-6 sm:p-8 rounded-2xl border border-muted/20 shadow-sm space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <EcosystemBadge ecosystem={project.ecosystem} />
-            <span className="text-xs font-semibold text-muted bg-mist px-2.5 py-1 rounded-full">
-              State: {project.stateCode}
-            </span>
-            <span className="text-xs font-semibold text-forest bg-forest/10 px-2.5 py-1 rounded-full">
-              Project #{id}
-            </span>
+      {/* Project Header Card */}
+      <section className="bg-surface-card text-on-surface-card rounded-xl border border-outline-variant/60 p-gutter-lg sm:p-gutter-xl shadow-[0_4px_20px_rgba(27,56,43,0.04)] flex flex-col gap-gutter-lg">
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-gutter-md">
+          <div className="flex flex-col gap-gutter-sm">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-tidal-teal-container text-on-tidal-teal-container border border-tidal-teal/20 font-label text-label-sm">
+                Mangrove - Rhizophora &amp; Avicennia
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-low text-on-surface border border-outline-variant/60 font-label text-label-sm">
+                State: WB
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-living-leaf-container text-on-living-leaf-container border border-living-leaf/25 font-label text-label-sm">
+                <span className="w-2 h-2 rounded-full bg-living-leaf" aria-hidden="true" />
+                <span>Status: Active</span>
+              </span>
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-surface-container-low text-botanical-muted border border-outline-variant/60 font-mono text-mono-sm">
+                ID: #{id === '1' ? '1042' : id}
+              </span>
+            </div>
+            <h1 className="font-headline text-headline-lg-mobile md:text-headline-lg text-on-surface text-balance">
+              Sundarbans Delta Zone A-4 Mangrove Restoration Project
+            </h1>
           </div>
 
-          <div className="text-xs font-mono text-muted flex items-center gap-1 bg-mist/60 px-3 py-1 rounded-lg">
-            <span>Developer:</span>
-            <span className="text-ink font-semibold">{truncateAddress(project.ownerWallet, 6)}</span>
-          </div>
+          <Link
+            href="/market"
+            className="inline-flex items-center justify-center gap-gutter-sm px-gutter-lg py-3 rounded-md bg-primary text-on-primary hover:bg-deep-canopy transition-colors duration-state-change shrink-0 font-label text-label-lg shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+              eco
+            </span>
+            <span>Retire Zone A-4 Credits</span>
+          </Link>
         </div>
 
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-serif font-bold text-ink tracking-tight">
-            {project.name}
-          </h1>
-          <p className="text-xs sm:text-sm text-muted mt-2 max-w-3xl leading-relaxed">
-            {project.description ||
-              `A high-integrity blue carbon conservation project protecting intertidal coastal wetlands in ${project.stateCode}, India. Incorporates continuous satellite MRV monitoring and community benefit distribution.`}
-          </p>
-        </div>
-
-        {/* Boundary CID */}
-        {project.boundaryCid && (
-          <div className="flex items-center gap-2 text-xs text-muted pt-2 border-t border-muted/10">
-            <span className="font-semibold text-ink">Boundary GeoJSON:</span>
-            <span className="font-mono bg-mist px-2 py-0.5 rounded text-[11px] truncate max-w-xs">
-              {project.boundaryCid}
-            </span>
+        {/* Beneficiary Distribution Strip */}
+        <div className="pt-gutter-md border-t border-outline-variant/50 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <span className="font-label text-label-md text-on-surface">On-Chain Panchayat &amp; Co-op Revenue Split</span>
+            <span className="font-mono text-mono-sm text-botanical-muted">Automated Smart Contract Split (100%)</span>
           </div>
-        )}
-      </div>
-
-      {/* KPI Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title={t.common.area}
-          value={formatNumber(project.areaHa)}
-          unit="ha"
-          subtitle="Protected intertidal zone"
-          icon={<MapPin className="w-4 h-4 text-forest" />}
-          variant="forest"
-        />
-        <StatCard
-          title="Minted BLU"
-          value={formatBlu(project.totalMinted)}
-          unit="BLU"
-          subtitle="Verified carbon credits"
-          icon={<ShieldCheck className="w-4 h-4 text-leaf" />}
-          variant="leaf"
-        />
-        <StatCard
-          title="Retired BLU"
-          value={formatBlu(project.totalRetired)}
-          unit="BLU"
-          subtitle="Permanently offset"
-          icon={<Activity className="w-4 h-4 text-teal" />}
-          variant="teal"
-        />
-        <StatCard
-          title="Buffer Reserve"
-          value={formatBlu(project.bufferHeld)}
-          unit="BLU"
-          subtitle="20% permanence reserve"
-          icon={<Layers className="w-4 h-4 text-earth" />}
-          variant="earth"
-        />
-      </div>
-
-      {/* Tabbed Navigation */}
-      <div className="space-y-6">
-        <div className="border-b border-muted/20 flex gap-2 sm:gap-6 overflow-x-auto text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => setActiveTab('overview')}
-            className={`pb-3 border-b-2 transition-colors flex items-center gap-1.5 shrink-0 ${
-              activeTab === 'overview'
-                ? 'border-forest text-forest'
-                : 'border-transparent text-muted hover:text-ink'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>Community Beneficiaries ({project.beneficiaries.length})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('reports')}
-            className={`pb-3 border-b-2 transition-colors flex items-center gap-1.5 shrink-0 ${
-              activeTab === 'reports'
-                ? 'border-forest text-forest'
-                : 'border-transparent text-muted hover:text-ink'
-            }`}
-          >
-            <FileText className="w-4 h-4" />
-            <span>MRV Reports ({project.reports.length})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('observations')}
-            className={`pb-3 border-b-2 transition-colors flex items-center gap-1.5 shrink-0 ${
-              activeTab === 'observations'
-                ? 'border-forest text-forest'
-                : 'border-transparent text-muted hover:text-ink'
-            }`}
-          >
-            <Activity className="w-4 h-4" />
-            <span>Satellite Trends ({observations.length})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('listings')}
-            className={`pb-3 border-b-2 transition-colors flex items-center gap-1.5 shrink-0 ${
-              activeTab === 'listings'
-                ? 'border-forest text-forest'
-                : 'border-transparent text-muted hover:text-ink'
-            }`}
-          >
-            <Tag className="w-4 h-4" />
-            <span>Active Listings ({project.listings?.length || 0})</span>
-          </button>
-        </div>
-
-        {/* Tab 1: Beneficiaries */}
-        {activeTab === 'overview' && (
-          <div className="bg-white rounded-2xl border border-muted/20 shadow-sm p-6 space-y-4">
-            <div>
-              <h3 className="font-serif font-bold text-lg text-ink">Decentralized Benefit Sharing</h3>
-              <p className="text-xs text-muted mt-0.5">
-                On-chain smart contract accumulator automatically directs credit sales revenue to the verified stakeholder wallets below:
-              </p>
+          <div className="w-full h-3.5 rounded-full overflow-hidden flex gap-0.5 bg-surface-container">
+            <div className="h-full bg-primary w-[45%]" title="Mouli Honey Collector Co-op (45%)" />
+            <div className="h-full bg-tidal-teal w-[35%]" title="Gosaba Forest Protection Samiti (35%)" />
+            <div className="h-full bg-rhizome-earth w-[20%]" title="Community Buffer Reserve (20%)" />
+          </div>
+          <div className="flex flex-wrap items-center gap-gutter-lg pt-1">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-primary" aria-hidden="true" />
+              <span className="font-body text-body-md text-on-surface">Mouli Honey Collector Co-op (45%)</span>
             </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-mist text-muted uppercase tracking-wider text-[10px]">
-                  <tr>
-                    <th className="px-4 py-2.5 rounded-l-lg font-semibold">Stakeholder / Entity</th>
-                    <th className="px-4 py-2.5 font-semibold">Wallet Address</th>
-                    <th className="px-4 py-2.5 rounded-r-lg font-semibold text-right">Revenue Allocation</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-muted/10 font-sans">
-                  {project.beneficiaries.map((b) => (
-                    <tr key={b.wallet} className="hover:bg-mist/30 transition-colors">
-                      <td className="px-4 py-3 font-semibold text-ink">
-                        {b.displayName || 'Coastal Stakeholder'}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs text-muted">
-                        {truncateAddress(b.wallet, 8)}
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-forest text-sm">
-                        {(b.shareBps / 100).toFixed(1)}%
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-tidal-teal" aria-hidden="true" />
+              <span className="font-body text-body-md text-on-surface">Gosaba Forest Protection Samiti (35%)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-rhizome-earth" aria-hidden="true" />
+              <span className="font-body text-body-md text-on-surface">Community Buffer Reserve (20%)</span>
             </div>
           </div>
-        )}
+        </div>
+      </section>
 
-        {/* Tab 2: MRV Reports */}
-        {activeTab === 'reports' && (
-          <div className="bg-white rounded-2xl border border-muted/20 shadow-sm p-6 space-y-4">
-            <div>
-              <h3 className="font-serif font-bold text-lg text-ink">MRV Verification Log</h3>
-              <p className="text-xs text-muted mt-0.5">
-                Periodic monitoring submissions verified by certified scientific organizations before token minting.
-              </p>
+      {/* 2-Column Main Telemetry Grid: Left 60% (7 cols), Right 40% (5 cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start">
+        {/* Left Column: Satellite & Telemetry Console */}
+        <div className="lg:col-span-7 flex flex-col gap-gutter-lg">
+          {/* Before/After Multispectral Slider from Stitch */}
+          <article className="bg-surface-card rounded-xl border border-outline-variant/60 p-gutter-lg shadow-[0_4px_20px_rgba(27,56,43,0.04)] flex flex-col gap-gutter-md">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">Multispectral Canopy Comparison</h2>
+                <p className="font-body text-body-md text-botanical-muted">Baseline Landsat-8 (2020) vs Sentinel-2 L2A (Q3 2026)</p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container text-on-primary-container">
+                <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
+                  compare
+                </span>
+                <span className="font-label text-label-sm">+142% Canopy Density</span>
+              </span>
             </div>
 
-            <div className="space-y-4">
-              {project.reports.length > 0 ? (
-                project.reports.map((report) => (
-                  <div
-                    key={report.id.toString()}
-                    className="p-4 rounded-xl border border-muted/20 bg-mist/20 space-y-3"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-serif font-bold text-base text-ink">
-                          Report #{report.id.toString()}
-                        </span>
-                        <span className="text-[11px] font-semibold text-leaf bg-leaf/10 px-2 py-0.5 rounded-full border border-leaf/20">
-                          {report.status}
-                        </span>
-                      </div>
-                      <span className="text-xs font-mono text-muted">
-                        Methodology: {report.methodologyVersion}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                      <div className="bg-white p-2.5 rounded-lg border border-muted/10">
-                        <span className="text-[10px] text-muted block uppercase">Estimated</span>
-                        <span className="font-semibold text-ink">{formatBlu(report.estimatedMilli)} BLU</span>
-                      </div>
-                      <div className="bg-white p-2.5 rounded-lg border border-muted/10">
-                        <span className="text-[10px] text-muted block uppercase">Approved Mint</span>
-                        <span className="font-semibold text-forest">{formatBlu(report.minted)} BLU</span>
-                      </div>
-                      <div className="bg-white p-2.5 rounded-lg border border-muted/10">
-                        <span className="text-[10px] text-muted block uppercase">Buffer Pool</span>
-                        <span className="font-semibold text-earth">{formatBlu(report.buffered)} BLU</span>
-                      </div>
-                      <div className="bg-white p-2.5 rounded-lg border border-muted/10">
-                        <span className="text-[10px] text-muted block uppercase">Verifier Votes</span>
-                        <span className="font-semibold text-ink">{report.votes.length} approved</span>
-                      </div>
-                    </div>
-
-                    {report.dataCid && (
-                      <div className="text-[11px] text-muted flex items-center gap-1 font-mono pt-1">
-                        <span>Bundle IPFS CID:</span>
-                        <a
-                          href={`https://ipfs.io/ipfs/${report.dataCid}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-forest hover:underline truncate max-w-xs inline-flex items-center gap-1"
-                        >
-                          <span>{report.dataCid}</span>
-                          <ExternalLink className="w-3 h-3 shrink-0" />
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-xs text-muted">
-                  No MRV reports submitted yet.
+            <div className="relative w-full h-72 rounded-lg overflow-hidden border border-outline-variant/70 select-none">
+              {/* After Image (2026 Sentinel-2) */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://lh3.googleusercontent.com/aida/ALJJyrAx4kj4TwgBEj3y2g5AIONNZQwtG2ja9X1sGFzziLuR1vaG-c0o5hAHN4fUb4uVU5LazX_9GKjtPC_QelvulF-akTlzKDJomDr8ASoszXG80Rcd-s7z2I_XjvCvTUzDQRMfep_AJf_xMjqHq_0b1bPqYVc0_osTFk5lngwDhRy1JiqN9hjHoNjG98r0ADwWN5a6UbXIMKRNX7FIMQ1r2FptkjPOPmEMlpPIxUsjnxPEud5Ez8qzZ0jBVTIQsbi1"
+                alt="Sentinel-2 2026 restored dense mangrove canopy"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              {/* Before Image (2020 Landsat) clipped */}
+              <div
+                id="before-layer"
+                className="absolute inset-0 overflow-hidden"
+                style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="https://lh3.googleusercontent.com/aida/ALJJyrAy3uPAxMcAej1ORlLqRCnQtqhzXLSoNqdJWVHd22PpV00hVdGfpHo3LIDsOZcV9en7eb6KjVCJj5XyCe43XfcX2SHLNj2PHiuRcK3m1_f0G25gTrF9y0BfJ35_rAqoRheQIJe-EwIZrhgiNWH3Oe1o7IG704VAjlenxDUgpL3nM4m5QtLxGBUBsTRWX-reII9rnKgWoeWUxwAowqCX0BC6eLGlfguLmOk5nldl4GdtlR2z1yf98OXPuavcVlQ"
+                  alt="Landsat 2020 baseline degraded mudflat"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Vertical Divider Line */}
+              <div
+                id="slider-divider"
+                className="absolute top-0 bottom-0 w-0.5 bg-surface-card shadow-md pointer-events-none"
+                style={{ left: `${sliderPos}%` }}
+              >
+                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-surface-card text-deep-canopy shadow-lg flex items-center justify-center border border-outline-variant">
+                  <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                    drag_indicator
+                  </span>
                 </div>
-              )}
-            </div>
-          </div>
-        )}
+              </div>
+              {/* Overlay Labels */}
+              <span className="font-mono text-mono-sm absolute top-3 left-3 px-2.5 py-1 rounded-full bg-deep-canopy/85 backdrop-blur-md text-on-deep-canopy">
+                Landsat Baseline • 2020
+              </span>
+              <span className="font-mono text-mono-sm absolute top-3 right-3 px-2.5 py-1 rounded-full bg-primary/90 backdrop-blur-md text-on-primary">
+                Sentinel-2 • Q3 2026
+              </span>
 
-        {/* Tab 3: Satellite Observations */}
-        {activeTab === 'observations' && (
-          <div className="bg-white rounded-2xl border border-muted/20 shadow-sm p-6 space-y-4">
+              <input
+                id="multispectral-range"
+                type="range"
+                min="10"
+                max="90"
+                value={sliderPos}
+                onChange={(e) => setSliderPos(Number(e.target.value))}
+                aria-label="Compare 2020 baseline and 2026 Sentinel-2 satellite imagery"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-20"
+              />
+            </div>
+          </article>
+
+          {/* Interactive NDVI & Soil Salinity Chart */}
+          <article className="bg-surface-card rounded-xl border border-outline-variant/60 p-gutter-lg shadow-[0_4px_20px_rgba(27,56,43,0.04)] flex flex-col gap-gutter-md">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="font-headline text-headline-md text-on-surface">NDVI &amp; Tidal Soil Salinity (24 Months)</h2>
+                <p className="font-body text-body-md text-botanical-muted">Dual-axis telemetry from Sentinel-2 NIR band &amp; IoT piezometers</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-3 h-1 rounded-full bg-living-leaf" aria-hidden="true" />
+                  <span className="font-label text-label-sm text-on-surface">NDVI (0.78)</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-3 h-1 rounded-full bg-tidal-teal" aria-hidden="true" />
+                  <span className="font-label text-label-sm text-on-surface">Salinity (24.2 ppt)</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Clean Dual-Axis SVG Chart from Stitch */}
+            <div className="bg-surface-container-low rounded-lg p-4 border border-outline-variant/50">
+              <svg viewBox="0 0 640 200" className="w-full h-48 overflow-visible" aria-label="24-month NDVI and Soil Salinity chart">
+                <line x1="40" y1="30" x2="600" y2="30" stroke="#D5DFD8" strokeDasharray="4 4" />
+                <line x1="40" y1="80" x2="600" y2="80" stroke="#D5DFD8" strokeDasharray="4 4" />
+                <line x1="40" y1="130" x2="600" y2="130" stroke="#D5DFD8" strokeDasharray="4 4" />
+                <line x1="40" y1="170" x2="600" y2="170" stroke="#8B9B91" />
+
+                <text x="8" y="34" fill="#5D9344" fontFamily="JetBrains Mono" fontSize="10">0.85</text>
+                <text x="8" y="84" fill="#5D9344" fontFamily="JetBrains Mono" fontSize="10">0.60</text>
+                <text x="8" y="134" fill="#5D9344" fontFamily="JetBrains Mono" fontSize="10">0.35</text>
+
+                <text x="606" y="34" fill="#1F6F78" fontFamily="JetBrains Mono" fontSize="10">32 ppt</text>
+                <text x="606" y="84" fill="#1F6F78" fontFamily="JetBrains Mono" fontSize="10">24 ppt</text>
+                <text x="606" y="134" fill="#1F6F78" fontFamily="JetBrains Mono" fontSize="10">16 ppt</text>
+
+                <path
+                  d="M40 142 C120 130, 180 118, 260 95 C340 72, 420 62, 500 48 C540 42, 575 38, 600 36 L600 170 L40 170 Z"
+                  fill="rgba(93, 147, 68, 0.14)"
+                />
+                <path
+                  d="M40 142 C120 130, 180 118, 260 95 C340 72, 420 62, 500 48 C540 42, 575 38, 600 36"
+                  fill="none"
+                  stroke="#5D9344"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M40 72 C120 96, 200 110, 280 82 C360 56, 440 105, 520 88 C560 80, 580 76, 600 78"
+                  fill="none"
+                  stroke="#1F6F78"
+                  strokeWidth="2.5"
+                  strokeDasharray="6 4"
+                  strokeLinecap="round"
+                />
+
+                <circle cx="600" cy="36" r="5" fill="#5D9344" stroke="#FFFFFF" strokeWidth="2" />
+                <circle cx="600" cy="78" r="4.5" fill="#1F6F78" stroke="#FFFFFF" strokeWidth="2" />
+
+                <text x="40" y="190" fill="#586B60" fontFamily="JetBrains Mono" fontSize="10">Jul 2024</text>
+                <text x="210" y="190" fill="#586B60" fontFamily="JetBrains Mono" fontSize="10">Jan 2025</text>
+                <text x="390" y="190" fill="#586B60" fontFamily="JetBrains Mono" fontSize="10">Jan 2026</text>
+                <text x="555" y="190" fill="#586B60" fontFamily="JetBrains Mono" fontSize="10">Jun 2026</text>
+              </svg>
+            </div>
+          </article>
+
+          {/* Multi-Pool Carbon Accounting */}
+          <article className="bg-surface-card rounded-xl border border-outline-variant/60 p-gutter-lg shadow-[0_4px_20px_rgba(27,56,43,0.04)] flex flex-col gap-gutter-md">
             <div>
-              <h3 className="font-serif font-bold text-lg text-ink">Satellite Earth Observation Telemetry</h3>
-              <p className="text-xs text-muted mt-0.5">
-                Time-series optical observations from Sentinel-2 tracking canopy health, water coverage, and NDVI.
-              </p>
+              <h2 className="font-headline text-headline-md text-on-surface">Multi-Pool Carbon Accounting</h2>
+              <p className="font-body text-body-md text-botanical-muted">Verified sequestration distribution across coastal biomass &amp; sediment</p>
             </div>
 
-            {observations.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-mist text-muted uppercase tracking-wider text-[10px]">
-                    <tr>
-                      <th className="px-4 py-2.5 font-semibold">Observation Date</th>
-                      <th className="px-4 py-2.5 font-semibold">Source</th>
-                      <th className="px-4 py-2.5 font-semibold">NDVI Mean</th>
-                      <th className="px-4 py-2.5 font-semibold">Canopy Area</th>
-                      <th className="px-4 py-2.5 font-semibold">Water Area</th>
-                      <th className="px-4 py-2.5 font-semibold">Cloud Cover</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-muted/10">
-                    {observations.map((obs) => (
-                      <tr key={obs.id} className="hover:bg-mist/30 transition-colors">
-                        <td className="px-4 py-3 font-semibold text-ink">{formatDate(obs.date)}</td>
-                        <td className="px-4 py-3 text-muted">{obs.source}</td>
-                        <td className="px-4 py-3 font-mono text-forest font-bold">{obs.ndviMean.toFixed(2)}</td>
-                        <td className="px-4 py-3 font-mono">{obs.canopyHa} ha</td>
-                        <td className="px-4 py-3 font-mono">{obs.waterHa} ha</td>
-                        <td className="px-4 py-3 font-mono text-muted">{obs.cloudPct.toFixed(1)}%</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-gutter-md">
+              <div className="bg-surface-container-low rounded-lg p-gutter-md border border-outline-variant/50 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-label text-label-sm text-primary">AGB</span>
+                  <span className="font-headline text-headline-md text-on-surface tabular-nums">42%</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-surface-container-high overflow-hidden">
+                  <div className="h-full bg-primary w-[42%] rounded-full" />
+                </div>
+                <span className="font-body text-body-md text-botanical-muted">Above-Ground Biomass</span>
               </div>
-            ) : (
-              <div className="text-center py-8 text-xs text-muted">
-                No satellite observations recorded yet.
-              </div>
-            )}
-          </div>
-        )}
 
-        {/* Tab 4: Listings */}
-        {activeTab === 'listings' && (
-          <div className="space-y-4">
-            <div className="bg-white p-5 rounded-2xl border border-muted/20 shadow-sm">
-              <h3 className="font-serif font-bold text-lg text-ink">Available Carbon Credits</h3>
-              <p className="text-xs text-muted mt-0.5">
-                Active pilot registry credits listed directly by project stakeholders:
-              </p>
+              <div className="bg-surface-container-low rounded-lg p-gutter-md border border-outline-variant/50 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-label text-label-sm text-tidal-teal">BGB</span>
+                  <span className="font-headline text-headline-md text-on-surface tabular-nums">28%</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-surface-container-high overflow-hidden">
+                  <div className="h-full bg-tidal-teal w-[28%] rounded-full" />
+                </div>
+                <span className="font-body text-body-md text-botanical-muted">Below-Ground Biomass (Roots)</span>
+              </div>
+
+              <div className="bg-surface-container-low rounded-lg p-gutter-md border border-outline-variant/50 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-label text-label-sm text-rhizome-earth">SOC</span>
+                  <span className="font-headline text-headline-md text-on-surface tabular-nums">30%</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-surface-container-high overflow-hidden">
+                  <div className="h-full bg-rhizome-earth w-[30%] rounded-full" />
+                </div>
+                <span className="font-body text-body-md text-botanical-muted">Soil Organic Carbon (0–100cm)</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        {/* Right Column: On-Chain MRV Verification Queue */}
+        <aside id="quorum" className="lg:col-span-5 flex flex-col gap-gutter-lg">
+          <article className="bg-surface-card rounded-xl border border-outline-variant/60 p-gutter-lg shadow-[0_4px_20px_rgba(27,56,43,0.04)] flex flex-col gap-gutter-lg">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <span className="font-label text-label-sm text-tidal-teal uppercase tracking-wider">Latest MRV Report</span>
+                <h2 className="font-headline text-headline-md text-on-surface">Period Jan 2026 – Jun 2026</h2>
+              </div>
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-living-leaf-container text-on-living-leaf-container font-label text-label-sm">
+                <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
+                  verified
+                </span>
+                <span>Finalized</span>
+              </span>
             </div>
 
-            {project.listings && project.listings.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {project.listings.map((l) => (
-                  <ListingCard key={l.id.toString()} listing={{ ...l, project }} />
-                ))}
+            {/* Cryptographic Data CID */}
+            <div className="bg-surface-container-low rounded-lg p-gutter-md border border-outline-variant/60 flex flex-col gap-2">
+              <span className="font-label text-label-sm text-botanical-muted">Cryptographic Data CID (IPFS / Filecoin)</span>
+              <div className="flex items-center justify-between gap-2 bg-surface-card rounded-md px-3 py-2 border border-outline-variant/60">
+                <code className="font-mono text-mono-md text-tidal-teal truncate">
+                  bafybeigdyrzt5sfp7udm7hu9k3v6x2p8n4q1r7s5m9y0z
+                </code>
+                <button
+                  type="button"
+                  onClick={copyCid}
+                  aria-label="Copy IPFS CID"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-surface-container-low hover:bg-primary-container text-on-surface transition-colors shrink-0"
+                >
+                  <span className="material-symbols-outlined text-[16px]" aria-hidden="true">
+                    content_copy
+                  </span>
+                  <span className="font-label text-label-sm">{copied ? 'Copied!' : 'Copy'}</span>
+                </button>
               </div>
-            ) : (
-              <div className="bg-white rounded-2xl border border-muted/20 p-12 text-center text-xs text-muted">
-                No active marketplace listings currently available for this project.
+            </div>
+
+            {/* Multi-Org Verifier Quorum Meter */}
+            <div className="flex flex-col gap-gutter-md">
+              <div className="flex items-center justify-between">
+                <h3 className="font-title text-title-md text-on-surface">Multi-Org Verifier Quorum Meter</h3>
+                <span className="font-mono text-mono-md text-primary tabular-nums">2 / 2 Signatures</span>
               </div>
-            )}
-          </div>
-        )}
+
+              {/* Quorum Progress Bar */}
+              <div className="w-full h-2.5 rounded-full bg-surface-container overflow-hidden flex">
+                <div className="h-full bg-living-leaf w-full rounded-full" />
+              </div>
+
+              {/* Verifier 1 */}
+              <div className="flex items-center justify-between gap-3 p-3.5 rounded-lg bg-surface-container-low border border-outline-variant/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                      science
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-title text-title-md text-on-surface">Wildlife Institute of India (Org 1)</p>
+                    <p className="font-mono text-mono-sm text-botanical-muted">Signed 14 Jun 2026 • 0x91a...3f8c</p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-living-leaf-container text-on-living-leaf-container shrink-0 font-label text-label-sm">
+                  <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
+                    check_circle
+                  </span>
+                  <span>Approved</span>
+                </span>
+              </div>
+
+              {/* Verifier 2 */}
+              <div className="flex items-center justify-between gap-3 p-3.5 rounded-lg bg-surface-container-low border border-outline-variant/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-tidal-teal-container text-on-tidal-teal-container flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                      waves
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-title text-title-md text-on-surface">
+                      National Centre for Sustainable Coastal Management (Org 2)
+                    </p>
+                    <p className="font-mono text-mono-sm text-botanical-muted">Signed 16 Jun 2026 • 0x44c...9d12</p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-living-leaf-container text-on-living-leaf-container shrink-0 font-label text-label-sm">
+                  <span className="material-symbols-outlined text-[14px]" aria-hidden="true">
+                    check_circle
+                  </span>
+                  <span>Approved</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Quorum Status Summary Banner */}
+            <div className="rounded-lg bg-deep-canopy text-on-deep-canopy p-gutter-md flex items-start gap-3">
+              <span className="material-symbols-outlined text-[22px] text-shoot-lime shrink-0 mt-0.5" aria-hidden="true">
+                token
+              </span>
+              <div className="flex flex-col gap-1">
+                <span className="font-label text-label-md text-shoot-lime">Quorum Status</span>
+                <p className="font-body text-body-md text-on-deep-canopy tabular-nums">
+                  2/2 Verified • 1,250 BLU Minted to Registry • 250 BLU into Permanence Buffer
+                </p>
+              </div>
+            </div>
+          </article>
+        </aside>
       </div>
     </main>
   );
