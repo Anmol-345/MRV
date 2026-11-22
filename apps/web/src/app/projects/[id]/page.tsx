@@ -39,7 +39,7 @@ export default function ProjectDetailPage({
         <div className="relative h-32 sm:h-40 overflow-hidden bg-deep-canopy">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=1600&q=80"
+            src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1600&q=80"
             alt="Sundarbans mangrove coastal canopy"
             className="w-full h-full object-cover opacity-40"
           />
@@ -132,7 +132,7 @@ export default function ProjectDetailPage({
               {/* After Image (2026 Sentinel-2) */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=1200&q=80"
+                src="https://images.unsplash.com/photo-1618245318763-a15176d00133?auto=format&fit=crop&w=1200&q=80"
                 alt="Sentinel-2 2026 restored dense mangrove canopy"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -326,7 +326,7 @@ export default function ProjectDetailPage({
                 <div className="relative h-28 overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=600&q=80"
+                    src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=600&q=80"
                     alt="Tidal creek hydrology channel"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />

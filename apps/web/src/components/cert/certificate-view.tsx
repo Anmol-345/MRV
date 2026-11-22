@@ -57,7 +57,7 @@ export function CertificateView({ data }: CertificateViewProps) {
         <div className="absolute inset-0 overflow-hidden opacity-[0.04] pointer-events-none select-none">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=1200&q=80"
+            src="https://images.unsplash.com/photo-1618245318763-a15176d00133?auto=format&fit=crop&w=1200&q=80"
             alt="Mangrove delta watermark seal"
             className="w-full h-full object-cover filter grayscale contrast-150"
           />

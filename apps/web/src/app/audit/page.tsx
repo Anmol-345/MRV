@@ -41,7 +41,7 @@ export default function AuditPage() {
         {/* Background Nature Imagery - Estuary & Coastal Mangrove */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=1600&q=80"
+          src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1600&q=80"
           alt="Mangrove estuary tidal creeks in Sundarbans"
           className="absolute inset-0 w-full h-full object-cover opacity-25"
         />

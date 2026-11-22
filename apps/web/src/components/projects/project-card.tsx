@@ -19,7 +19,7 @@ export interface ProjectCardData {
 
 const ECOSYSTEM_IMAGES: Record<string, string> = {
   Mangrove:
-    'https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1618245318763-a15176d00133?auto=format&fit=crop&w=800&q=80',
   Seagrass:
     'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
   SaltMarsh:
@@ -55,7 +55,7 @@ export function ProjectCard({ project }: { project: ProjectCardData }) {
   const StatusIcon = statusConfig.icon;
   const imageUrl =
     ECOSYSTEM_IMAGES[project.ecosystem] ||
-    'https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=800&q=80';
+    'https://images.unsplash.com/photo-1618245318763-a15176d00133?auto=format&fit=crop&w=800&q=80';
 
   return (
     <div className="bg-surface-card rounded-2xl border border-outline-variant/60 shadow-[0_4px_20px_rgba(27,56,43,0.04)] hover:shadow-lg hover:border-primary/40 transition-all duration-surface-enter overflow-hidden flex flex-col group relative">

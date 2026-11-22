@@ -24,7 +24,7 @@ const SITES: Record<string, SiteData> = {
     blu: '142,800.000 BLU',
     projectId: 1,
     imageUrl:
-      'https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1618245318763-a15176d00133?auto=format&fit=crop&w=800&q=80',
   },
   pichavaram: {
     state: 'Tamil Nadu • ID #1045',
@@ -94,7 +94,7 @@ export default function HomePage() {
         {/* Aerial View of Sundarbans Mangrove Canals */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=1800&q=80"
+          src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1800&q=80"
           alt="Aerial view of Sundarbans mangrove forest canals winding through brackish estuary water"
           className="absolute inset-0 w-full h-full object-cover opacity-35"
         />

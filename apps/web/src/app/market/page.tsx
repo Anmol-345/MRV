@@ -25,7 +25,7 @@ const INITIAL_LISTINGS: ListingItem[] = [
     available: '450.000 BLU',
     unitPrice: 42.5,
     imageUrl:
-      'https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1618245318763-a15176d00133?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: '2',

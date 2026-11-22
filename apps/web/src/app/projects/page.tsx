@@ -48,7 +48,7 @@ export default function ProjectsPage() {
         {/* Background Nature Imagery - Mangrove Forest Canals */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1544979590-37e9b47eb705?auto=format&fit=crop&w=1600&q=80"
+          src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1600&q=80"
           alt="Aerial view of coastal mangrove delta"
           className="absolute inset-0 w-full h-full object-cover opacity-25"
         />
