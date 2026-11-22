@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const DEFAULT_VARA_WS = process.env.NEXT_PUBLIC_VARA_WS || 'wss://testnet.vara.network';
+const DEFAULT_VARA_WS = process.env.NEXT_PUBLIC_VARA_WS || 'wss://rpc.vara.network';
 
 function CustomAlertTemplate({ alert, close }: AlertTemplateProps) {
   return (

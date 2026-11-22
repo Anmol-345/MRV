@@ -5,6 +5,9 @@
   "description": "Blockchain-based Blue Carbon Registry and MRV Platform for India",
   "scripts": {
     "build": "pnpm -r run build",
+    "start": "pnpm --filter @blutoken/web start",
+    "start:web": "pnpm --filter @blutoken/web start",
+    "start:indexer": "pnpm --filter @blutoken/indexer start",
     "lint": "pnpm -r run lint",
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test",

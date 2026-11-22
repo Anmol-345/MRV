@@ -1,0 +1,14 @@
+node_modules/
+.pnpm-store/
+.git/
+.next/
+contracts/target/
+contracts/**/target/
+dist/
+build/
+*.tsbuildinfo
+*.exe
+.env.local
+.env.*.local
+*.log
+pgdata/
